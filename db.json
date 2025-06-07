@@ -1,0 +1,22 @@
+{
+  "bursaries": [
+    {
+      "id": 1,
+      "awardName": "te",
+      "adminUser": "fdsfdsf",
+      "xmlString": "<?xml version=\"1.0\"?>\n<rules>\n  <group>\n    <logic>AND</logic>\n    <rule>\n      <name>age</name>\n      <comparator>equals</comparator>\n      <value>6</value>\n    </rule>\n  </group>\n</rules>"
+    },
+    {
+      "id": 2,
+      "awardName": "dssfdsfsd",
+      "adminUser": "sdsad",
+      "xmlString": "<?xml version=\"1.0\"?>\n<rules>\n  <group>\n    <logic>AND</logic>\n    <rule>\n      <name>dob</name>\n      <comparator>before</comparator>\n      <value>2025-06-19</value>\n    </rule>\n  </group>\n</rules>"
+    },
+    {
+      "id": 3,
+      "awardName": "Test Nam",
+      "adminUser": "hello",
+      "xmlString": "<?xml version=\"1.0\"?>\n<rules>\n  <group>\n    <logic>AND</logic>\n    <rule>\n      <name>enrolment_status</name>\n      <comparator>not_equals</comparator>\n      <value>false</value>\n    </rule>\n    <group>\n      <logic>OR</logic>\n      <rule>\n        <name>age</name>\n        <comparator>equals</comparator>\n        <value>21</value>\n      </rule>\n      <rule>\n        <name>income</name>\n        <comparator>less_than</comparator>\n        <value>20000</value>\n      </rule>\n    </group>\n  </group>\n</rules>"
+    }
+  ]
+}
