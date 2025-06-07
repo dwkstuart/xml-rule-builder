@@ -18,7 +18,8 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run linter and save output
-        run: npm run lint > lint-report.txt 2>&1 || true
+        run: |
+          npm run lint | tee lint-report.txt
       - name: Create Issue on Lint Failure
         if: failure()
         uses: peter-evans/create-issue-from-file@v4
