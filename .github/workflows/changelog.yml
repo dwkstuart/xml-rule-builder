@@ -8,6 +8,13 @@ on:
       - '**/package.json'
       - '**/src/**'
       - '**/components/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/package.json'
+      - '**/src/**'
+      - '**/components/**'
 
 jobs:
   changelog:
