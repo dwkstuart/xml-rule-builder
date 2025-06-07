@@ -1,6 +1,6 @@
 # XmlRulesUi
 
-XmlRulesUi is a demo React application for building, editing, and managing rules in XML format. The app provides a user-friendly interface to create and modify bursary rules, visualize them, and export the rules as XML. It is designed to simplify the process of working with complex rule sets, making it accessible for users who need to define or update rules without directly editing XML files.
+XmlRulesUi is a React application for building, editing, and managing rules in XML format. The app provides a user-friendly interface to create and modify bursary rules, visualize them, and export the rules as XML. It is designed to simplify the process of working with complex rule sets, making it accessible for users who need to define or update rules without directly editing XML files.
 
 ## Features
 - Interactive rule builder for bursary rules
