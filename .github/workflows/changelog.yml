@@ -1,6 +1,7 @@
 name: Generate Changelog
 
 on:
+  workflow_dispatch:      # <-- Add this line to allow manual runs
   push:
     branches:
       - main
