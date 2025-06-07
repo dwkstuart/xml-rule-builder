@@ -78,16 +78,6 @@ const initialState: RuleBuilderState = {
   error: ''
 };
 
-function getBlockByPath(root: RuleBlock, path: number[]): RuleBlock {
-  let node = root;
-  for (const idx of path) {
-    if (node.type === 'group') {
-      node = node.children[idx];
-    }
-  }
-  return node;
-}
-
 function updateBlockByPath(root: RuleBlock, path: number[], updater: (block: RuleBlock) => RuleBlock): RuleBlock {
   if (path.length === 0) return updater(root);
   if (root.type !== 'group') return root;
@@ -171,7 +161,7 @@ const ruleBuilderSlice = createSlice({
       state.error = '';
     },
     // Add this reducer for replacing the root block from XML or parsed rules
-    replaceRoot(state, action: PayloadAction<any>) {
+    replaceRoot(state, action: PayloadAction<RuleBlock>) {
       state.root = action.payload;
     }
   }

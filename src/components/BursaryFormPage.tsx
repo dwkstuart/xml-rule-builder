@@ -39,7 +39,7 @@ const BursaryFormPage: React.FC = () => {
       const result = await response.json();
       console.log('Saved bursary object, id:', result.id);
       setSubmitted(true);
-    } catch (err) {
+    } catch {
       setFormError('Network or server error.');
     }
   };

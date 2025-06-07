@@ -99,7 +99,7 @@ const GroupBlock: React.FC<{
           sx={{ minWidth: 140 }}
         >
           {Array.isArray(block.ruleType?.comparators)
-            ? (block.ruleType.comparators as { label: string; value: string }[]).map((comp, j) => (
+            ? (block.ruleType.comparators as { label: string; value: string }[]).map((comp) => (
                 <MenuItem key={comp.value} value={comp.value}>{comp.label}</MenuItem>
               ))
             : null}

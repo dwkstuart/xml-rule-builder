@@ -80,7 +80,7 @@ const EditBursaryPage: React.FC<EditBursaryPageProps> = ({ bursaryId, onBack }) 
         return;
       }
       setSubmitted(true);
-    } catch (err) {
+    } catch {
       setFormError('Network or server error.');
     }
   };

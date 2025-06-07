@@ -19,6 +19,7 @@ jobs:
         run: npm install
       - name: Run linter and save output
         run: |
+          set -o pipefail
           npm run lint | tee lint-report.txt
       - name: Create Issue on Lint Failure
         if: failure()
