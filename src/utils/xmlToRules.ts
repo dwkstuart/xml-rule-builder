@@ -1,14 +1,27 @@
 import { XMLParser } from 'fast-xml-parser';
-import { xmlTypes } from '../ruleBuilderSlice';
+import { xmlTypes, RuleBlock } from '../ruleBuilderSlice';
 
-export function xmlToRules(xmlString: string) {
+type XmlGroup = {
+  logic?: string | { '#text': string };
+  rule?: XmlRule | XmlRule[];
+  group?: XmlGroup | XmlGroup[];
+};
+
+type XmlRule = {
+  name: string;
+  comparator: string;
+  value: string;
+};
+
+export function xmlToRules(xmlString: string): RuleBlock {
   const parser = new XMLParser({ ignoreAttributes: false });
   const jsObj = parser.parse(xmlString);
 
   // Helper to recursively convert XML to your rule/group format
-  function convertGroup(group: any) {
-    const logic = group.logic || (group['logic'] && group['logic']['#text']) || 'AND';
-    let children: any[] = [];
+  function convertGroup(group: XmlGroup): RuleBlock {
+    const logicRaw = typeof group.logic === 'object' ? group.logic['#text'] : group.logic || 'AND';
+    const logic: 'AND' | 'OR' = logicRaw === 'OR' ? 'OR' : 'AND';
+    let children: RuleBlock[] = [];
 
     if (Array.isArray(group.rule)) {
       children = group.rule.map(convertRule);
@@ -29,7 +42,7 @@ export function xmlToRules(xmlString: string) {
     };
   }
 
-  function convertRule(rule: any) {
+  function convertRule(rule: XmlRule): RuleBlock {
     // Map ruleType and comparator to the correct objects from xmlTypes
     const ruleTypeObj = xmlTypes.find(t => t.value === rule.name) || xmlTypes[0];
     const comparatorObj = ruleTypeObj.comparators.find(c => c.value === rule.comparator) || ruleTypeObj.comparators[0];

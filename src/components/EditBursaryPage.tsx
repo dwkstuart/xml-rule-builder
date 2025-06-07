@@ -19,7 +19,7 @@ const EditBursaryPage: React.FC<EditBursaryPageProps> = ({ bursaryId, onBack }) 
   const [formError, setFormError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [initialRules, setInitialRules] = useState<any>(null);
+  const [initialRules, setInitialRules] = useState<import('../ruleBuilderSlice').RuleBlock | null>(null);
 
 
   // Fetch bursary by id
@@ -27,14 +27,13 @@ const EditBursaryPage: React.FC<EditBursaryPageProps> = ({ bursaryId, onBack }) 
     setLoading(true);
     fetch(`http://localhost:4000/bursaries`)
       .then(res => res.json())
-      .then((bursaries) => {
-        const bursary = bursaries.find((b: any) => b.id === bursaryId);
+      .then((bursaries: Array<{ id: number; awardName: string; adminUser: string; xmlString: string }>) => {
+        const bursary = bursaries.find((b) => b.id === bursaryId);
         if (bursary) {
           setAwardName(bursary.awardName);
           setAdminUser(bursary.adminUser);
           setXmlString(bursary.xmlString);
           setInitialRules(xmlToRules(bursary.xmlString));
-
         } else {
           setFormError('Bursary not found');
         }

@@ -14,7 +14,8 @@ import {
   setXml,
   setError,
   clearError,
-  replaceRoot
+  replaceRoot,
+  RuleBlock
 } from '../ruleBuilderSlice';
 import XmlOutput from './XmlOutput';
 import ErrorMessage from './ErrorMessage';
@@ -30,9 +31,9 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 
 const GroupBlock: React.FC<{
-  block: any;
+  block: RuleBlock;
   path: number[];
-  parent: any;
+  parent: RuleBlock | null;
 }> = ({ block, path, parent }) => {
   const dispatch = useDispatch();
   const [inputError, setInputError] = React.useState<string>('');
@@ -141,7 +142,7 @@ const GroupBlock: React.FC<{
         )}
       </Stack>
       <Box ml={2}>
-        {block.children.map((child: any, i: number) => (
+        {block.children.map((child, i) => (
           <GroupBlock key={i} block={child} path={[...path, i]} parent={block} />
         ))}
       </Box>
@@ -159,8 +160,7 @@ const GroupBlock: React.FC<{
 
 interface BursaryRuleBuilderProps {
   onXmlChange?: (xml: string) => void;
-    initialRules?: any; // type this to your rule/group structure
-
+  initialRules?: RuleBlock | null;
 }
 
 const BursaryRuleBuilder: React.FC<BursaryRuleBuilderProps> = ({ onXmlChange, initialRules }) => {
@@ -180,13 +180,13 @@ const BursaryRuleBuilder: React.FC<BursaryRuleBuilderProps> = ({ onXmlChange, in
     }
   }, [xml, onXmlChange]);
 
-  function hasEmptyValue(block: any): boolean {
+  function hasEmptyValue(block: RuleBlock): boolean {
     if (block.type === 'rule') {
       if (block.value === undefined || block.value === null) return true;
       if (typeof block.value === 'string' && !block.value.trim()) return true;
       return false;
     }
-    return block.children.some((child: any) => hasEmptyValue(child));
+    return block.children.some((child) => hasEmptyValue(child));
   }
 
   const buildXml = () => {
@@ -197,7 +197,7 @@ const BursaryRuleBuilder: React.FC<BursaryRuleBuilderProps> = ({ onXmlChange, in
     }
     dispatch(clearError());
     const doc = create({ version: '1.0' }).ele('rules');
-    function buildXmlBlock(block: any, doc: any) {
+    function buildXmlBlock(block: RuleBlock, doc: import('xmlbuilder2/lib/interfaces').XMLBuilder): void {
       if (block.type === 'rule') {
         const ruleElem = doc.ele('rule');
         ruleElem.ele('name').txt(block.ruleType.value).up();
@@ -207,7 +207,7 @@ const BursaryRuleBuilder: React.FC<BursaryRuleBuilderProps> = ({ onXmlChange, in
       } else {
         const groupElem = doc.ele('group');
         groupElem.ele('logic').txt(block.logic).up();
-        block.children.forEach((child: any) => buildXmlBlock(child, groupElem));
+        block.children.forEach((child) => buildXmlBlock(child, groupElem));
         groupElem.up();
       }
     }

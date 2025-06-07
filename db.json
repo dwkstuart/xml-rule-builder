@@ -17,6 +17,18 @@
       "awardName": "Test Nam",
       "adminUser": "hello",
       "xmlString": "<?xml version=\"1.0\"?>\n<rules>\n  <group>\n    <logic>AND</logic>\n    <rule>\n      <name>enrolment_status</name>\n      <comparator>not_equals</comparator>\n      <value>false</value>\n    </rule>\n    <group>\n      <logic>OR</logic>\n      <rule>\n        <name>age</name>\n        <comparator>equals</comparator>\n        <value>21</value>\n      </rule>\n      <rule>\n        <name>income</name>\n        <comparator>less_than</comparator>\n        <value>20000</value>\n      </rule>\n    </group>\n  </group>\n</rules>"
+    },
+    {
+      "id": 4,
+      "awardName": "Test",
+      "adminUser": "David",
+      "xmlString": "<?xml version=\"1.0\"?>\n<rules>\n  <group>\n    <logic>OR</logic>\n    <rule>\n      <name>age</name>\n      <comparator>equals</comparator>\n      <value>2</value>\n    </rule>\n  </group>\n</rules>"
+    },
+    {
+      "id": 5,
+      "awardName": "hello",
+      "adminUser": "njjnf,dsn",
+      "xmlString": "<?xml version=\"1.0\"?>\n<rules>\n  <group>\n    <logic>AND</logic>\n    <rule>\n      <name>dob</name>\n      <comparator>before</comparator>\n      <value>2025-06-27</value>\n    </rule>\n  </group>\n</rules>"
     }
   ]
 }

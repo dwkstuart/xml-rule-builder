@@ -13,9 +13,16 @@ import Paper from '@mui/material/Paper';
 import BursaryFormPage from './BursaryFormPage';
 import EditBursaryPage from './EditBursaryPage';
 
+interface Award {
+  id: number;
+  awardName: string;
+  adminUser: string;
+  xmlString: string;
+}
+
 const HomePage: React.FC = () => {
   const [mode, setMode] = useState<'home' | 'create' | 'view'>('home');
-  const [awards, setAwards] = useState<any[]>([]);
+  const [awards, setAwards] = useState<Award[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -28,10 +35,10 @@ const HomePage: React.FC = () => {
     try {
       const res = await fetch('http://localhost:4000/bursaries');
       if (!res.ok) throw new Error('Failed to fetch awards');
-      const data = await res.json();
+      const data: Award[] = await res.json();
       setAwards(data);
-    } catch (e: any) {
-      setError(e.message || 'Error fetching awards');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error fetching awards');
     }
     setLoading(false);
   };
