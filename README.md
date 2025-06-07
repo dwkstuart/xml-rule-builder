@@ -25,6 +25,15 @@ XmlRulesUi is a React application for building, editing, and managing rules in X
    ```
 3. Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal).
 
+## Running the API Server Locally
+To run the mock API server for development, use the following command in your project directory:
+
+```powershell
+node api-server.js
+```
+
+The server will start on http://localhost:4000 by default. Make sure the API server is running before using features that require backend data.
+
 ## Project Structure
 - `src/` — Main application source code
 - `public/` — Static files and HTML template

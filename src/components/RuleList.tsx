@@ -17,6 +17,7 @@ const RuleList: React.FC<RuleListProps> = ({
   rules, logic, onTypeChange, onComparatorChange, onValueChange, onRemove, onAdd, xmlTypes
 }) => (
   <>
+    <h2>Rules</h2>
     {rules.map((rule, idx) => (
       <RuleRow
         key={idx}
