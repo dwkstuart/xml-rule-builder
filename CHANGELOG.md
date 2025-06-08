@@ -45,3 +45,9 @@ This file is generated and updated automatically by the changelog workflow.
 
 
 
+## 0.1.0 (2025-06-08)
+
+* chore(changelog): update changelog generation to append changes ([faec6de](https://github.com/dwkstuart/XmlRulesUI/commit/faec6de))
+
+
+
