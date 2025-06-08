@@ -51,3 +51,9 @@ This file is generated and updated automatically by the changelog workflow.
 
 
 
+## 0.1.0 (2025-06-08)
+
+* Mutliple xml type (#3) ([3ee6b32](https://github.com/dwkstuart/XmlRulesUI/commit/3ee6b32)), closes [#3](https://github.com/dwkstuart/XmlRulesUI/issues/3)
+
+
+
