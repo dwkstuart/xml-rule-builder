@@ -5,6 +5,8 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import BursaryRuleBuilder from './BursaryRuleBuilder';
 import { xmlToRules } from '../utils/xmlToRules'; // import the utility
+import { useDispatch } from 'react-redux';
+import { replaceRoot, defaultGroup } from '../ruleBuilderSlice';
 
 
 interface EditBursaryPageProps {
@@ -13,6 +15,7 @@ interface EditBursaryPageProps {
 }
 
 const EditBursaryPage: React.FC<EditBursaryPageProps> = ({ bursaryId, onBack }) => {
+  const dispatch = useDispatch();
   const [awardName, setAwardName] = useState('');
   const [adminUser, setAdminUser] = useState('');
   const [xmlString, setXmlString] = useState('');
@@ -20,6 +23,7 @@ const EditBursaryPage: React.FC<EditBursaryPageProps> = ({ bursaryId, onBack }) 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [initialRules, setInitialRules] = useState<import('../ruleBuilderSlice').RuleBlock | null>(null);
+  const [xmlBuilt, setXmlBuilt] = useState(false);
 
 
   // Fetch bursary by id
@@ -54,10 +58,29 @@ const EditBursaryPage: React.FC<EditBursaryPageProps> = ({ bursaryId, onBack }) 
     setSubmitted(false);
     setLoading(true);
     setInitialRules(null);
+    setXmlBuilt(false);
   }, [bursaryId]);
 
+  // Reset xmlBuilt to false when rules change
   const handleXmlChange = (xml: string) => {
     setXmlString(xml);
+    // Do not set xmlBuilt here
+  };
+
+  // Called when Build XML is pressed
+  const handleBuildXml = (xml: string) => {
+    setXmlString(xml);
+    setXmlBuilt(true);
+  };
+
+  // Set xmlBuilt to false when user edits awardName or adminUser
+  const handleAwardNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAwardName(e.target.value);
+    setXmlBuilt(false);
+  };
+  const handleAdminUserChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAdminUser(e.target.value);
+    setXmlBuilt(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -80,22 +103,33 @@ const EditBursaryPage: React.FC<EditBursaryPageProps> = ({ bursaryId, onBack }) 
         return;
       }
       setSubmitted(true);
+      setXmlBuilt(false); // Disable button after successful save
     } catch {
       setFormError('Network or server error.');
     }
   };
 
+  // Clear rules from state when navigating away
+  useEffect(() => {
+    return () => {
+      dispatch(replaceRoot(defaultGroup())); // Use empty group, not null
+    };
+  }, [dispatch]);
+
   if (loading) return <Typography>Loading...</Typography>;
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', mt: 5, p: 3, border: '1px solid #eee', borderRadius: 2, background: '#fafafa' }}>
-      <Button onClick={onBack} sx={{ mb: 2 }}>&larr; Back</Button>
+      <Button onClick={() => { 
+        if (onBack) onBack();
+        dispatch(replaceRoot(defaultGroup())); // Use empty group, not null
+      }} sx={{ mb: 2 }}>&larr; Back</Button>
       <Typography variant="h5" mb={2}>Edit Bursary Award</Typography>
       <form onSubmit={handleSubmit}>
         <TextField
           label="Bursary Name"
           value={awardName}
-          onChange={e => setAwardName(e.target.value)}
+          onChange={handleAwardNameChange}
           fullWidth
           required
           sx={{ mb: 2 }}
@@ -103,17 +137,17 @@ const EditBursaryPage: React.FC<EditBursaryPageProps> = ({ bursaryId, onBack }) 
         <TextField
           label="Admin User"
           value={adminUser}
-          onChange={e => setAdminUser(e.target.value)}
+          onChange={handleAdminUserChange}
           fullWidth
           required
           sx={{ mb: 2 }}
         />
         <Box sx={{ my: 3 }}>
-          <BursaryRuleBuilder initialRules={initialRules} onXmlChange={handleXmlChange} />
+          <BursaryRuleBuilder initialRules={initialRules} onXmlChange={handleXmlChange} onBuildXml={handleBuildXml} />
         </Box>
         {formError && <Typography color="error" sx={{ mb: 2 }}>{formError}</Typography>}
         {submitted && <Typography color="success.main" sx={{ mb: 2 }}>Bursary updated!</Typography>}
-        <Button type="submit" variant="contained" color="primary" fullWidth>
+        <Button type="submit" variant="contained" color="primary" fullWidth disabled={!xmlBuilt}>
           Save Changes
         </Button>
       </form>

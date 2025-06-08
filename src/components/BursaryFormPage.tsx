@@ -3,9 +3,14 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useDispatch } from 'react-redux';
+import { replaceRoot, defaultGroup } from '../ruleBuilderSlice';
 import BursaryRuleBuilder from './BursaryRuleBuilder';
+import { useNavigate } from 'react-router-dom';
 
 const BursaryFormPage: React.FC = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [awardName, setAwardName] = useState('');
   const [adminUser, setAdminUser] = useState('');
   const [xmlString, setXmlString] = useState('');
@@ -44,8 +49,18 @@ const BursaryFormPage: React.FC = () => {
     }
   };
 
+  React.useEffect(() => {
+    return () => {
+      dispatch(replaceRoot(defaultGroup()));
+    };
+  }, [dispatch]);
+
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', mt: 5, p: 3, border: '1px solid #eee', borderRadius: 2, background: '#fafafa' }}>
+      <Button onClick={() => {
+        navigate('/');
+        dispatch(replaceRoot(defaultGroup()));
+      }} sx={{ mb: 2 }}>&larr; Back</Button>
       <Typography variant="h5" mb={2}>Create Bursary Award</Typography>
       <form onSubmit={handleSubmit}>
         <TextField
