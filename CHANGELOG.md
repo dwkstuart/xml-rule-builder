@@ -69,3 +69,9 @@ This file is generated and updated automatically by the changelog workflow.
 
 
 
+## 0.1.0 (2025-06-09)
+
+* feat(bursaries): enhance bursary retrieval and mapping for frontend compatibility (#14) ([9a4b05d](https://github.com/dwkstuart/XmlRulesUI/commit/9a4b05d)), closes [#14](https://github.com/dwkstuart/XmlRulesUI/issues/14)
+
+
+
