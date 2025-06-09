@@ -126,7 +126,6 @@ const GroupBlock: React.FC<{
   return (
     <Paper elevation={3} sx={{ p: 2, m: 2, borderRadius: 2 }}>
       <Stack direction="row" alignItems="center" spacing={2} mb={2}>
-        <Typography variant="subtitle1">Match Logic:</Typography>
         <Select
           value={block.logic}
           onChange={e => dispatch(setLogic({ path, logic: e.target.value as 'AND' | 'OR' }))}
