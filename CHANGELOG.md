@@ -57,3 +57,9 @@ This file is generated and updated automatically by the changelog workflow.
 
 
 
+## 0.1.0 (2025-06-09)
+
+* build(deps): update package-lock.json and package.json ([2910cd4](https://github.com/dwkstuart/XmlRulesUI/commit/2910cd4))
+
+
+
