@@ -63,3 +63,9 @@ This file is generated and updated automatically by the changelog workflow.
 
 
 
+## 0.1.0 (2025-06-09)
+
+* Merge branch 'main' of github.com:dwkstuart/XmlRulesUI into main ([323452a](https://github.com/dwkstuart/XmlRulesUI/commit/323452a))
+
+
+
