@@ -41,6 +41,18 @@
       "awardName": "New Rule",
       "adminUser": "david",
       "xmlString": "<?xml version=\"1.0\"?>\n<rules>\n  <group>\n    <logic>AND</logic>\n    <age>\n      <comparator>equals</comparator>\n      <value>23</value>\n    </age>\n  </group>\n</rules>"
+    },
+    {
+      "id": 8,
+      "awardName": "Test",
+      "adminUser": "Test",
+      "xmlString": "<?xml version=\"1.0\"?>\n<rules>\n  <group>\n    <logic>AND</logic>\n    <age>\n      <comparator>equals</comparator>\n      <value>12</value>\n    </age>\n  </group>\n</rules>"
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "password": "YWRtaW4="
     }
   ]
 }

@@ -14,7 +14,8 @@ import {
   setError,
   clearError,
   replaceRoot,
-  RuleBlock
+  RuleBlock,
+  defaultGroup
 } from '../ruleBuilderSlice';
 import { xmlTypesConst } from '../xmlTypes';
 import XmlOutput from './XmlOutput';
