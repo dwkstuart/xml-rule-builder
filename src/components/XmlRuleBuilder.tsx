@@ -82,9 +82,9 @@ const GroupBlock: React.FC<{
       <Paper elevation={2} sx={{ p: 2, m: 1, borderRadius: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
         <Select
           value={block.ruleType.value}
-          onChange={e => onUpdate(path, (block) => {
+          onChange={(e: React.ChangeEvent<HTMLInputElement> | (Event & { target: { value: unknown; name: string } })) => onUpdate(path, (block) => {
             if (block.type !== 'rule') return block;
-            const ruleType = availableTypes.find(t => t.value === e.target.value)!;
+            const ruleType = availableTypes.find(t => t.value === e.target.value as string)!;
             return {
               ...block,
               ruleType,
@@ -101,12 +101,12 @@ const GroupBlock: React.FC<{
         </Select>
         <Select
           value={block.comparator?.value || ''}
-          onChange={e => onUpdate(path, (block) => {
+          onChange={(e: React.ChangeEvent<HTMLInputElement> | (Event & { target: { value: unknown; name: string } })) => onUpdate(path, (block) => {
             if (block.type !== 'rule') return block;
             const ruleType = block.ruleType;
             return {
               ...block,
-              comparator: ruleType.comparators.find(c => c.value === e.target.value)!
+              comparator: ruleType.comparators.find(c => c.value === e.target.value as string)!
             };
           })}
           size="small"
@@ -149,7 +149,7 @@ const GroupBlock: React.FC<{
       <Stack direction="row" alignItems="center" spacing={2} mb={2}>
         <Select
           value={block.logic}
-          onChange={e => onUpdate(path, (block) => {
+          onChange={(e: React.ChangeEvent<HTMLInputElement> | (Event & { target: { value: unknown; name: string } })) => onUpdate(path, (block) => {
             if (block.type !== 'group') return block;
             return { ...block, logic: e.target.value as 'AND' | 'OR' };
           })}
