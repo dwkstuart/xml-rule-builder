@@ -26,3 +26,9 @@
 
 
 
+## 0.1.0 (2025-06-22)
+
+* chore: update changelog and package dependencies (#8) ([94a0658](https://github.com/dwkstuart/xml-rule-builder/commit/94a0658)), closes [#8](https://github.com/dwkstuart/xml-rule-builder/issues/8)
+
+
+
