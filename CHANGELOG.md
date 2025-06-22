@@ -32,3 +32,9 @@
 
 
 
+## 0.1.0 (2025-06-22)
+
+* chore: update author and license information in package.json and README (#9) ([101d100](https://github.com/dwkstuart/xml-rule-builder/commit/101d100)), closes [#9](https://github.com/dwkstuart/xml-rule-builder/issues/9)
+
+
+
