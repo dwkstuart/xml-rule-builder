@@ -169,7 +169,7 @@
             <div id="default-tab" class="tab-content active">
                 <div class="demo-section">
                     <h2>Default XML Types Demo</h2>
-                    <p>This demo shows the XML Rules Builder with the default rule types (Age, Date of Birth, Household Income, Enrolment Status).</p>
+                    <p>This demo shows the XML Rules Builder with the default rule types (Age, Date of Birth, Email, Postcode, Zipcode, Income, Gender, Relationship Status, Nationality, Disabilities).</p>
                     
                     <div class="button-group">
                         <button class="button" onclick="loadDefaultTypes()">Load Default Types</button>
@@ -289,7 +289,35 @@ const customTypes = [
                 ]
             },
             {
-                label: 'Household Income',
+                label: 'Email',
+                value: 'email',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Contains', value: 'contains' },
+                    { label: 'Ends With', value: 'ends_with' },
+                    { label: 'Domain', value: 'domain' }
+                ]
+            },
+            {
+                label: 'Postcode',
+                value: 'postcode',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Starts With', value: 'starts_with' },
+                    { label: 'In Area', value: 'in_area' }
+                ]
+            },
+            {
+                label: 'Zipcode',
+                value: 'zipcode',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Starts With', value: 'starts_with' },
+                    { label: 'In Area', value: 'in_area' }
+                ]
+            },
+            {
+                label: 'Income',
                 value: 'income',
                 comparators: [
                     { label: 'Less Than', value: 'less_than' },
@@ -299,11 +327,39 @@ const customTypes = [
                 ]
             },
             {
-                label: 'Enrolment Status',
-                value: 'enrolment_status',
+                label: 'Gender',
+                value: 'gender',
                 comparators: [
                     { label: 'Equals', value: 'equals' },
-                    { label: 'Not Equals', value: 'not_equals' }
+                    { label: 'Not Equals', value: 'not_equals' },
+                    { label: 'In', value: 'in' }
+                ]
+            },
+            {
+                label: 'Relationship Status',
+                value: 'relationship_status',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Not Equals', value: 'not_equals' },
+                    { label: 'In', value: 'in' }
+                ]
+            },
+            {
+                label: 'Nationality',
+                value: 'nationality',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Not Equals', value: 'not_equals' },
+                    { label: 'In', value: 'in' }
+                ]
+            },
+            {
+                label: 'Disabilities',
+                value: 'disabilities',
+                comparators: [
+                    { label: 'Has', value: 'has' },
+                    { label: 'Does Not Have', value: 'does_not_have' },
+                    { label: 'Count', value: 'count' }
                 ]
             }
         ];
@@ -360,6 +416,9 @@ const customTypes = [
                     inputType = 'number';
                     adornment = '£';
                 }
+                if (block.ruleType.value === 'email') inputType = 'email';
+                if (block.ruleType.value === 'postcode' || block.ruleType.value === 'zipcode') inputType = 'text';
+                if (block.ruleType.value === 'disabilities') inputType = 'text';
 
                 const handleValueChange = (e) => {
                     const val = e.target.value;
@@ -374,6 +433,12 @@ const customTypes = [
                     }
                     if (block.ruleType.value === 'income') {
                         if (!/^\d+(\.\d{1,2})?$/.test(val)) error = 'Income must be a number';
+                    }
+                    if (block.ruleType.value === 'email') {
+                        if (val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) error = 'Please enter a valid email address';
+                    }
+                    if (block.ruleType.value === 'postcode' || block.ruleType.value === 'zipcode') {
+                        if (val && !/^[A-Z0-9\s-]+$/i.test(val)) error = 'Please enter a valid postal code';
                     }
                     
                     setInputError(error);
@@ -733,6 +798,13 @@ const customTypes = [
         let currentTypes = [...mockXmlTypes];
         let currentOutput = '';
 
+        // Helper function to escape HTML entities
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         // Demo functions
         window.loadDefaultTypes = function() {
             currentTypes = [...mockXmlTypes];
@@ -740,10 +812,13 @@ const customTypes = [
                 <XmlRuleBuilder 
                     onXmlChange={(xml) => {
                         currentOutput = xml;
-                        document.getElementById('default-output').innerHTML = `
+                        const outputDiv = document.getElementById('default-output');
+                        outputDiv.innerHTML = `
                             <div class="success">XML generated successfully!</div>
-                            <div class="xml-output">${xml}</div>
+                            <div class="xml-output"></div>
                         `;
+                        const xmlOutputDiv = outputDiv.querySelector('.xml-output');
+                        xmlOutputDiv.textContent = xml;
                     }}
                     onValidationChange={(isValid, errors) => {
                         if (!isValid) {
@@ -770,10 +845,13 @@ const customTypes = [
                     config={{ xmlTypes: customTypes }}
                     onXmlChange={(xml) => {
                         currentOutput = xml;
-                        document.getElementById('custom-output').innerHTML = `
+                        const outputDiv = document.getElementById('custom-output');
+                        outputDiv.innerHTML = `
                             <div class="success">XML generated successfully!</div>
-                            <div class="xml-output">${xml}</div>
+                            <div class="xml-output"></div>
                         `;
+                        const xmlOutputDiv = outputDiv.querySelector('.xml-output');
+                        xmlOutputDiv.textContent = xml;
                     }}
                     onValidationChange={(isValid, errors) => {
                         if (!isValid) {
@@ -801,10 +879,13 @@ const customTypes = [
                     config={{ xmlTypes: fileTypes }}
                     onXmlChange={(xml) => {
                         currentOutput = xml;
-                        document.getElementById('file-output').innerHTML = `
+                        const outputDiv = document.getElementById('file-output');
+                        outputDiv.innerHTML = `
                             <div class="success">XML generated successfully!</div>
-                            <div class="xml-output">${xml}</div>
+                            <div class="xml-output"></div>
                         `;
+                        const xmlOutputDiv = outputDiv.querySelector('.xml-output');
+                        xmlOutputDiv.textContent = xml;
                     }}
                     onValidationChange={(isValid, errors) => {
                         if (!isValid) {
