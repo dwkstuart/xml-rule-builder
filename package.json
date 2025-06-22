@@ -2,7 +2,6 @@
   "name": "xml-rules-builder",
   "version": "0.1.0",
   "description": "A TypeScript library for building and managing XML-based rule systems",
-  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

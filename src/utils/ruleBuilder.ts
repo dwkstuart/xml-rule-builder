@@ -16,4 +16,19 @@ export function createDefaultGroup(): RuleBlock {
     logic: 'AND',
     children: [createDefaultRule()]
   };
+}
+
+// Function to create a rule with a specific rule type
+export function createRuleWithType(ruleTypeValue: string): RuleBlock {
+  const ruleType = xmlTypes.find(t => t.value === ruleTypeValue);
+  if (!ruleType) {
+    throw new Error(`Rule type '${ruleTypeValue}' not found in configured types`);
+  }
+  
+  return {
+    type: 'rule',
+    ruleType,
+    comparator: ruleType.comparators[0],
+    value: ''
+  };
 } 

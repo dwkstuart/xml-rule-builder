@@ -8,7 +8,7 @@ A TypeScript library for building and managing XML-based rule systems, with opti
 - **React Components** for easy UI integration
 - **Validation** with detailed error reporting
 - **Type Safety** with full TypeScript support
-- **Configurable Rule Types** - users can define and modify rule types
+- **Configurable Rule Types** - define your own custom rule types
 - **Flexible Rule Structure** supporting nested groups with AND/OR logic
 
 ## Installation
@@ -47,25 +47,19 @@ if (!validation.isValid) {
 const defaultRules = createDefaultGroup();
 ```
 
-### Configuring Rule Types
+### Configurable XML Types
 
-The library comes with default rule types, but you can configure them to match your needs:
+The library allows you to define custom rule types and comparators:
+
+#### Method 1: Set custom types directly
 
 ```typescript
-import { 
-  setXmlTypes, 
-  addXmlType, 
-  removeXmlType, 
-  updateXmlType, 
-  getXmlTypes,
-  type XmlRuleType 
-} from 'xml-rules-builder';
+import { setXmlTypes, type XmlRuleType } from 'xml-rules-builder';
 
-// Replace all rule types
 const customTypes: XmlRuleType[] = [
   {
-    label: 'Score',
-    value: 'score',
+    label: 'GPA',
+    value: 'gpa',
     comparators: [
       { label: 'Greater Than', value: 'greater_than' },
       { label: 'Less Than', value: 'less_than' },
@@ -73,8 +67,8 @@ const customTypes: XmlRuleType[] = [
     ]
   },
   {
-    label: 'Category',
-    value: 'category',
+    label: 'Course Level',
+    value: 'course_level',
     comparators: [
       { label: 'Equals', value: 'equals' },
       { label: 'Not Equals', value: 'not_equals' }
@@ -83,33 +77,89 @@ const customTypes: XmlRuleType[] = [
 ];
 
 setXmlTypes(customTypes);
+```
 
-// Add a new rule type
-addXmlType({
-  label: 'Priority',
-  value: 'priority',
-  comparators: [
-    { label: 'High', value: 'high' },
-    { label: 'Medium', value: 'medium' },
-    { label: 'Low', value: 'low' }
+#### Method 2: Load from configuration object
+
+```typescript
+import { loadXmlTypesFromConfig, type XmlTypesConfig } from 'xml-rules-builder';
+
+const config: XmlTypesConfig = {
+  ruleTypes: [
+    {
+      label: 'Age',
+      value: 'age',
+      comparators: [
+        { label: 'Equals', value: 'equals' },
+        { label: 'Less Than', value: 'less_than' },
+        { label: 'Greater Than', value: 'greater_than' }
+      ]
+    }
   ]
-});
+};
 
-// Remove a rule type
-removeXmlType('age');
+loadXmlTypesFromConfig(config);
+```
 
-// Update an existing rule type
-updateXmlType('score', {
-  label: 'Test Score',
-  value: 'score',
-  comparators: [
-    { label: 'Pass', value: 'pass' },
-    { label: 'Fail', value: 'fail' }
+#### Method 3: Load from configuration file
+
+```typescript
+import { loadXmlTypesFromFile } from 'xml-rules-builder';
+
+// Load from a JSON file
+await loadXmlTypesFromFile('./config/xml-types.json');
+```
+
+Configuration file format (`xml-types.json`):
+```json
+{
+  "ruleTypes": [
+    {
+      "label": "Age",
+      "value": "age",
+      "comparators": [
+        { "label": "Equals", "value": "equals" },
+        { "label": "Less Than", "value": "less_than" },
+        { "label": "Greater Than", "value": "greater_than" }
+      ]
+    },
+    {
+      "label": "GPA",
+      "value": "gpa",
+      "comparators": [
+        { "label": "Greater Than", "value": "greater_than" },
+        { "label": "Less Than", "value": "less_than" }
+      ]
+    }
   ]
-});
+}
+```
 
-// Get current rule types
-const currentTypes = getXmlTypes();
+#### Method 4: Add to existing types
+
+```typescript
+import { addXmlTypes } from 'xml-rules-builder';
+
+const additionalTypes = [
+  {
+    label: 'Test Score',
+    value: 'test_score',
+    comparators: [
+      { label: 'Greater Than', value: 'greater_than' },
+      { label: 'Less Than', value: 'less_than' }
+    ]
+  }
+];
+
+addXmlTypes(additionalTypes);
+```
+
+#### Reset to default types
+
+```typescript
+import { resetToDefaultTypes } from 'xml-rules-builder';
+
+resetToDefaultTypes();
 ```
 
 ### React Components
@@ -128,11 +178,25 @@ function MyComponent() {
     }
   };
 
+  // Use with custom types
+  const customConfig = {
+    xmlTypes: [
+      {
+        label: 'Custom Field',
+        value: 'custom_field',
+        comparators: [
+          { label: 'Equals', value: 'equals' },
+          { label: 'Not Equals', value: 'not_equals' }
+        ]
+      }
+    ]
+  };
+
   return (
     <XmlRuleBuilder 
       onXmlChange={handleXmlChange}
       onValidationChange={handleValidationChange}
-      initialRules={defaultRules}
+      config={customConfig}
     />
   );
 }
@@ -161,22 +225,25 @@ Create a default rule with the first available rule type.
 #### `createDefaultGroup(): RuleBlock`
 Create a default group containing one default rule.
 
-### Rule Type Configuration
+#### `createRuleWithType(ruleTypeValue: string): RuleBlock`
+Create a rule with a specific rule type.
 
-#### `setXmlTypes(types: XmlRuleType[]): void`
-Replace all rule types with the provided array.
+### Configuration Functions
 
-#### `addXmlType(type: XmlRuleType): void`
-Add a new rule type to the existing list.
+#### `setXmlTypes(customTypes: XmlRuleType[]): void`
+Replace all XML types with custom types.
 
-#### `removeXmlType(value: string): void`
-Remove a rule type by its value.
+#### `loadXmlTypesFromConfig(config: XmlTypesConfig): void`
+Load XML types from a configuration object.
 
-#### `updateXmlType(value: string, updatedType: XmlRuleType): void`
-Update an existing rule type.
+#### `loadXmlTypesFromFile(filePath: string): Promise<void>`
+Load XML types from a JSON configuration file.
 
-#### `getXmlTypes(): XmlRuleType[]`
-Get a copy of the current rule types array.
+#### `addXmlTypes(additionalTypes: XmlRuleType[]): void`
+Add additional types to existing ones.
+
+#### `resetToDefaultTypes(): void`
+Reset to the default XML types.
 
 ### Block Operations
 
@@ -233,6 +300,25 @@ interface XmlComparator {
 }
 ```
 
+#### `XmlTypesConfig`
+Configuration object for XML types:
+
+```typescript
+interface XmlTypesConfig {
+  ruleTypes: XmlRuleType[];
+}
+```
+
+#### `XmlRuleBuilderConfig`
+Configuration for the React component:
+
+```typescript
+interface XmlRuleBuilderConfig {
+  xmlTypes?: XmlRuleType[];
+  configFile?: string;
+}
+```
+
 #### `ValidationResult`
 Result of rule validation:
 
@@ -253,10 +339,11 @@ A React component for building XML rules with a visual interface.
 - `onXmlChange?: (xml: string) => void` - Callback when XML changes
 - `initialRules?: RuleBlock | null` - Initial rule structure
 - `onValidationChange?: (isValid: boolean, errors: string[]) => void` - Callback when validation changes
+- `config?: XmlRuleBuilderConfig` - Configuration for custom types
 
 ## Default Rule Types
 
-The library includes these default rule types that can be modified:
+The library includes default rule types that can be replaced or extended:
 
 - **Age**: Equals, Less Than, Greater Than, Between
 - **Date of Birth**: Before, After, On, Between

@@ -1,10 +1,10 @@
-import { XmlRuleType, XmlComparator } from './xmlTypes';
+import { xmlTypes } from './xmlTypes';
 
 export type RuleBlock =
   | {
       type: 'rule';
-      ruleType: XmlRuleType;
-      comparator: XmlComparator;
+      ruleType: typeof xmlTypes[number];
+      comparator: { label: string; value: string };
       value: string;
     }
   | {
@@ -29,5 +29,23 @@ export interface ValidationResult {
   errors: string[];
 }
 
-// Re-export for convenience
-export type { XmlRuleType, XmlComparator }; 
+export interface XmlRuleType {
+  label: string;
+  value: string;
+  comparators: XmlComparator[];
+}
+
+export interface XmlComparator {
+  label: string;
+  value: string;
+}
+
+// Configuration types for custom XML types
+export interface XmlTypesConfig {
+  ruleTypes: XmlRuleType[];
+}
+
+export interface XmlRuleBuilderConfig {
+  xmlTypes?: XmlRuleType[];
+  configFile?: string;
+} 

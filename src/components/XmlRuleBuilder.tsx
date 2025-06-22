@@ -1,5 +1,5 @@
 import React from 'react';
-import { RuleBlock } from '../types';
+import { RuleBlock, XmlRuleBuilderConfig } from '../types';
 import { xmlTypes } from '../xmlTypes';
 import { createDefaultGroup } from '../utils/ruleBuilder';
 import { addRuleToGroup, addGroupToGroup, removeBlockFromGroup, updateBlockByPath } from '../utils/blockOperations';
@@ -21,6 +21,7 @@ interface XmlRuleBuilderProps {
   onXmlChange?: (xml: string) => void;
   initialRules?: RuleBlock | null;
   onValidationChange?: (isValid: boolean, errors: string[]) => void;
+  config?: XmlRuleBuilderConfig;
 }
 
 const GroupBlock: React.FC<{
@@ -31,7 +32,8 @@ const GroupBlock: React.FC<{
   onAddRule: (path: number[], index: number) => void;
   onAddGroup: (path: number[], index: number) => void;
   onRemoveBlock: (path: number[], index: number) => void;
-}> = ({ block, path, parent, onUpdate, onAddRule, onAddGroup, onRemoveBlock }) => {
+  availableTypes: typeof xmlTypes;
+}> = ({ block, path, parent, onUpdate, onAddRule, onAddGroup, onRemoveBlock, availableTypes }) => {
   const [inputError, setInputError] = React.useState<string>('');
 
   if (block.type === 'rule') {
@@ -82,7 +84,7 @@ const GroupBlock: React.FC<{
           value={block.ruleType.value}
           onChange={e => onUpdate(path, (block) => {
             if (block.type !== 'rule') return block;
-            const ruleType = xmlTypes.find(t => t.value === e.target.value)!;
+            const ruleType = availableTypes.find(t => t.value === e.target.value)!;
             return {
               ...block,
               ruleType,
@@ -93,7 +95,7 @@ const GroupBlock: React.FC<{
           size="small"
           sx={{ minWidth: 140 }}
         >
-          {xmlTypes.map(type => (
+          {availableTypes.map(type => (
             <MenuItem key={type.value} value={type.value}>{type.label}</MenuItem>
           ))}
         </Select>
@@ -178,6 +180,7 @@ const GroupBlock: React.FC<{
             onAddRule={onAddRule}
             onAddGroup={onAddGroup}
             onRemoveBlock={onRemoveBlock}
+            availableTypes={availableTypes}
           />
         ))}
       </Box>
@@ -204,11 +207,15 @@ const GroupBlock: React.FC<{
 const XmlRuleBuilder: React.FC<XmlRuleBuilderProps> = ({ 
   onXmlChange, 
   initialRules, 
-  onValidationChange 
+  onValidationChange,
+  config
 }) => {
   const [root, setRoot] = React.useState<RuleBlock>(initialRules || createDefaultGroup());
   const [xml, setXml] = React.useState<string>('');
   const [validation, setValidation] = React.useState<{ isValid: boolean; errors: string[] }>({ isValid: false, errors: [] });
+
+  // Use custom types if provided in config, otherwise use default types
+  const availableTypes = config?.xmlTypes || xmlTypes;
 
   React.useEffect(() => {
     if (initialRules) {
@@ -286,6 +293,7 @@ const XmlRuleBuilder: React.FC<XmlRuleBuilderProps> = ({
         onAddRule={handleAddRule}
         onAddGroup={handleAddGroup}
         onRemoveBlock={handleRemoveBlock}
+        availableTypes={availableTypes}
       />
 
       {validation.isValid && xml && (

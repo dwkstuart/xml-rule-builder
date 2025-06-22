@@ -1,20 +1,11 @@
 // xmlTypes.ts
 // Contains the xmlTypes array and related export for use throughout the app
-// This is configurable by users
+// This can be configured with custom types
 
-export interface XmlRuleType {
-  label: string;
-  value: string;
-  comparators: XmlComparator[];
-}
+import { XmlRuleType, XmlTypesConfig } from './types';
 
-export interface XmlComparator {
-  label: string;
-  value: string;
-}
-
-// Default xmlTypes that can be modified by users
-export let xmlTypes: XmlRuleType[] = [
+// Default XML types
+const defaultXmlTypes: XmlRuleType[] = [
   {
     label: 'Age',
     value: 'age',
@@ -55,31 +46,83 @@ export let xmlTypes: XmlRuleType[] = [
   }
 ];
 
-// Functions to configure xmlTypes
-export function setXmlTypes(types: XmlRuleType[]): void {
-  xmlTypes = [...types];
+// Mutable array that can be updated with custom types
+let xmlTypes: XmlRuleType[] = [...defaultXmlTypes];
+
+// Function to set custom XML types
+export function setXmlTypes(customTypes: XmlRuleType[]): void {
+  xmlTypes = [...customTypes];
 }
 
-export function addXmlType(type: XmlRuleType): void {
-  xmlTypes.push(type);
+// Function to reset to default types
+export function resetToDefaultTypes(): void {
+  xmlTypes = [...defaultXmlTypes];
 }
 
-export function removeXmlType(value: string): void {
-  xmlTypes = xmlTypes.filter(t => t.value !== value);
+// Function to add custom types to existing ones
+export function addXmlTypes(additionalTypes: XmlRuleType[]): void {
+  xmlTypes = [...xmlTypes, ...additionalTypes];
 }
 
-export function updateXmlType(value: string, updatedType: XmlRuleType): void {
-  const index = xmlTypes.findIndex(t => t.value === value);
-  if (index !== -1) {
-    xmlTypes[index] = updatedType;
+// Function to load types from a configuration file
+export async function loadXmlTypesFromFile(filePath: string): Promise<void> {
+  try {
+    const response = await fetch(filePath);
+    if (!response.ok) {
+      throw new Error(`Failed to load config file: ${response.statusText}`);
+    }
+    const config: XmlTypesConfig = await response.json();
+    
+    if (!config.ruleTypes || !Array.isArray(config.ruleTypes)) {
+      throw new Error('Invalid config file format: ruleTypes array is required');
+    }
+    
+    // Validate the structure of each rule type
+    for (const ruleType of config.ruleTypes) {
+      if (!ruleType.label || !ruleType.value || !Array.isArray(ruleType.comparators)) {
+        throw new Error(`Invalid rule type structure: ${JSON.stringify(ruleType)}`);
+      }
+      
+      for (const comparator of ruleType.comparators) {
+        if (!comparator.label || !comparator.value) {
+          throw new Error(`Invalid comparator structure: ${JSON.stringify(comparator)}`);
+        }
+      }
+    }
+    
+    xmlTypes = [...config.ruleTypes];
+  } catch (error) {
+    console.error('Error loading XML types from file:', error);
+    throw error;
   }
 }
 
-export function getXmlTypes(): XmlRuleType[] {
-  return [...xmlTypes];
+// Function to load types from a configuration object
+export function loadXmlTypesFromConfig(config: XmlTypesConfig): void {
+  if (!config.ruleTypes || !Array.isArray(config.ruleTypes)) {
+    throw new Error('Invalid config: ruleTypes array is required');
+  }
+  
+  // Validate the structure of each rule type
+  for (const ruleType of config.ruleTypes) {
+    if (!ruleType.label || !ruleType.value || !Array.isArray(ruleType.comparators)) {
+      throw new Error(`Invalid rule type structure: ${JSON.stringify(ruleType)}`);
+    }
+    
+    for (const comparator of ruleType.comparators) {
+      if (!comparator.label || !comparator.value) {
+        throw new Error(`Invalid comparator structure: ${JSON.stringify(comparator)}`);
+      }
+    }
+  }
+  
+  xmlTypes = [...config.ruleTypes];
 }
 
-// Backward compatibility - readonly version (deprecated)
+// Export the current xmlTypes array
+export { xmlTypes };
+
+// Backward compatibility - readonly version
 export const xmlTypesConst = xmlTypes;
 
 // Type for the xmlTypes array
