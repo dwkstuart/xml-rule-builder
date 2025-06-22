@@ -1,5 +1,6 @@
 // xmlTypes.ts
 // Contains the xmlTypes array and related export for use throughout the app
+// This is read-only and cannot be modified by users
 
 export const xmlTypes = [
   {
@@ -40,6 +41,11 @@ export const xmlTypes = [
       { label: 'Not Equals', value: 'not_equals' }
     ]
   }
-];
+] as const;
 
+// Backward compatibility - readonly version
 export const xmlTypesConst = xmlTypes;
+
+// Type for the xmlTypes array
+export type XmlTypesArray = typeof xmlTypes;
+export type XmlType = XmlTypesArray[number];

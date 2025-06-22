@@ -1,0 +1,11 @@
+---
+description: 
+globs: *.ts
+alwaysApply: false
+---
+Tasks for creating and editing typescript files
+
+Avoid using any as a type
+Create small reusuable components where possible
+
+Ensure properties are correctly passed
