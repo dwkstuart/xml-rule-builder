@@ -1,0 +1,91 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - 'v*-alpha*'
+      - 'v*-beta*'
+      - 'v*-rc*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run tests
+        run: npm run test
+        
+      - name: Run linting
+        run: npm run lint
+        
+      - name: Build package
+        run: npm run build:clean
+        
+      - name: Determine tag type
+        id: tag-type
+        run: |
+          if [[ $GITHUB_REF == *"-alpha"* ]]; then
+            echo "type=alpha" >> $GITHUB_OUTPUT
+          elif [[ $GITHUB_REF == *"-beta"* ]]; then
+            echo "type=beta" >> $GITHUB_OUTPUT
+          elif [[ $GITHUB_REF == *"-rc"* ]]; then
+            echo "type=rc" >> $GITHUB_OUTPUT
+          else
+            echo "type=latest" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Publish to npm
+        run: |
+          if [ "${{ steps.tag-type.outputs.type }}" = "alpha" ]; then
+            npm publish --tag alpha
+          elif [ "${{ steps.tag-type.outputs.type }}" = "beta" ]; then
+            npm publish --tag beta
+          elif [ "${{ steps.tag-type.outputs.type }}" = "rc" ]; then
+            npm publish --tag rc
+          else
+            npm publish
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Create GitHub release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## What's Changed
+            
+            This release includes:
+            - Bug fixes and improvements
+            - Enhanced TypeScript support
+            - Better React component integration
+            
+            ## Installation
+            
+            ```bash
+            npm install xml-rule-builder
+            ```
+            
+            ## Usage
+            
+            ```typescript
+            import { XmlRuleBuilder } from 'xml-rule-builder';
+            ```
+          draft: false
+          prerelease: ${{ contains(github.ref, '-') }} 
