@@ -47,6 +47,11 @@ jobs:
             echo "type=latest" >> $GITHUB_OUTPUT
           fi
           
+      - name: Set up .npmrc for publishing
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
       - name: Publish to npm
         run: |
           if [ "${{ steps.tag-type.outputs.type }}" = "alpha" ]; then
