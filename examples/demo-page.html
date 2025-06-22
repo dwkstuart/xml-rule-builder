@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XML Rules Builder Demo</title>
+    <title>XML RuleKit Demo</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/@mui/material@5.15.0/umd/material-ui.development.js"></script>
     <script src="https://unpkg.com/@emotion/react@11.11.1/dist/emotion-react.umd.min.js"></script>
     <script src="https://unpkg.com/@emotion/styled@11.11.0/dist/emotion-styled.umd.min.js"></script>
+    <script src="https://unpkg.com/fast-xml-parser@5.2.4/src/fxp.js"></script>
+    <script src="https://unpkg.com/xmlbuilder2@3.1.1/lib/index.js"></script>
+    
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             padding: 20px;
             background-color: #f5f5f5;
@@ -33,241 +36,156 @@
         }
         .header h1 {
             margin: 0;
-            font-size: 2.5rem;
+            font-size: 2.5em;
             font-weight: 300;
         }
         .header p {
             margin: 10px 0 0 0;
             opacity: 0.9;
-            font-size: 1.1rem;
+            font-size: 1.1em;
         }
         .content {
             padding: 30px;
         }
-        .demo-section {
+        .section {
             margin-bottom: 40px;
             padding: 20px;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             background: #fafafa;
         }
-        .demo-section h2 {
+        .section h2 {
             margin-top: 0;
             color: #333;
             border-bottom: 2px solid #667eea;
             padding-bottom: 10px;
         }
-        .config-example {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 15px;
-            margin: 15px 0;
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 0.9rem;
-            overflow-x: auto;
+        .demo-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #ddd;
         }
         .xml-output {
-            background: #2d3748;
-            color: #e2e8f0;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
             border-radius: 4px;
             padding: 15px;
-            margin: 15px 0;
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 0.9rem;
-            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        .validation-errors {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            color: #856404;
+        }
+        .config-display {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
             white-space: pre-wrap;
         }
-        .error {
-            background: #fed7d7;
-            border: 1px solid #feb2b2;
-            color: #c53030;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
-        .success {
-            background: #c6f6d5;
-            border: 1px solid #9ae6b4;
-            color: #22543d;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
         .button-group {
-            display: flex;
-            gap: 10px;
             margin: 15px 0;
-            flex-wrap: wrap;
         }
-        .button {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 10px 20px;
+        .button-group button {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .status {
+            padding: 10px;
             border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.2s;
+            margin: 10px 0;
+            font-weight: bold;
         }
-        .button:hover {
-            background: #5a67d8;
+        .status.valid {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
-        .button.secondary {
-            background: #718096;
-        }
-        .button.secondary:hover {
-            background: #4a5568;
-        }
-        .button.danger {
-            background: #e53e3e;
-        }
-        .button.danger:hover {
-            background: #c53030;
-        }
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid #e0e0e0;
-            margin-bottom: 20px;
-        }
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-        }
-        .tab.active {
-            border-bottom-color: #667eea;
-            color: #667eea;
-            font-weight: 600;
-        }
-        .tab:hover {
-            background: #f7fafc;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
+        .status.invalid {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>XML Rules Builder</h1>
-            <p>A TypeScript library for building and managing XML-based rule systems</p>
+            <h1>XML RuleKit</h1>
+            <p>A TypeScript toolkit for building and managing XML-based rule systems</p>
         </div>
         
         <div class="content">
-            <div class="tabs">
-                <div class="tab active" onclick="switchTab('default')">Default Types</div>
-                <div class="tab" onclick="switchTab('custom')">Custom Types</div>
-                <div class="tab" onclick="switchTab('file')">File Configuration</div>
+            <div class="section">
+                <h2>🎯 Features Demo</h2>
+                <p>This demo showcases the configurable XML types functionality of XML RuleKit. You can switch between different configurations to see how the rule builder adapts.</p>
             </div>
 
-            <div id="default-tab" class="tab-content active">
-                <div class="demo-section">
-                    <h2>Default XML Types Demo</h2>
-                    <p>This demo shows the XML Rules Builder with the default rule types (Age, Date of Birth, Household Income, Enrolment Status).</p>
-                    
-                    <div class="button-group">
-                        <button class="button" onclick="loadDefaultTypes()">Load Default Types</button>
-                        <button class="button secondary" onclick="showDefaultConfig()">Show Default Config</button>
-                    </div>
-
-                    <div id="default-builder"></div>
-                    <div id="default-output"></div>
+            <div class="section">
+                <h2>🔧 Configuration Controls</h2>
+                <div class="button-group">
+                    <button onclick="useDefaultTypes()">Use Default Types</button>
+                    <button onclick="useCustomTypes()">Use Custom Types</button>
+                    <button onclick="useFileBasedTypes()">Use File-Based Types</button>
+                    <button onclick="addToExistingTypes()">Add to Existing Types</button>
+                    <button onclick="resetToDefaults()">Reset to Defaults</button>
+                </div>
+                <div id="config-display" class="config-display">
+                    <strong>Current Configuration:</strong> Default XML Types
                 </div>
             </div>
 
-            <div id="custom-tab" class="tab-content">
-                <div class="demo-section">
-                    <h2>Custom XML Types Demo</h2>
-                    <p>This demo shows how to use custom rule types defined programmatically.</p>
-                    
-                    <div class="config-example">
-const customTypes = [
-  {
-    label: 'GPA',
-    value: 'gpa',
-    comparators: [
-      { label: 'Greater Than', value: 'greater_than' },
-      { label: 'Less Than', value: 'less_than' },
-      { label: 'Equals', value: 'equals' }
-    ]
-  },
-  {
-    label: 'Course Level',
-    value: 'course_level',
-    comparators: [
-      { label: 'Equals', value: 'equals' },
-      { label: 'Not Equals', value: 'not_equals' }
-    ]
-  }
-];
-                    </div>
-
-                    <div class="button-group">
-                        <button class="button" onclick="loadCustomTypes()">Load Custom Types</button>
-                        <button class="button secondary" onclick="resetToDefault()">Reset to Default</button>
-                    </div>
-
-                    <div id="custom-builder"></div>
-                    <div id="custom-output"></div>
+            <div class="section">
+                <h2>🏗️ Rule Builder</h2>
+                <div class="demo-container">
+                    <div id="rule-builder"></div>
                 </div>
             </div>
 
-            <div id="file-tab" class="tab-content">
-                <div class="demo-section">
-                    <h2>File Configuration Demo</h2>
-                    <p>This demo shows how to load XML types from a configuration file.</p>
-                    
-                    <div class="config-example">
-// custom-types-config.json
-{
-  "ruleTypes": [
-    {
-      "label": "Test Score",
-      "value": "test_score",
-      "comparators": [
-        { "label": "Greater Than", "value": "greater_than" },
-        { "label": "Less Than", "value": "less_than" }
-      ]
-    },
-    {
-      "label": "Department",
-      "value": "department",
-      "comparators": [
-        { "label": "Equals", "value": "equals" },
-        { "label": "Not Equals", "value": "not_equals" }
-      ]
-    }
-  ]
-}
-                    </div>
+            <div class="section">
+                <h2>📄 Generated XML</h2>
+                <div class="demo-container">
+                    <div id="xml-output" class="xml-output">No XML generated yet. Start building rules above!</div>
+                </div>
+            </div>
 
-                    <div class="button-group">
-                        <button class="button" onclick="loadFromFile()">Load from File</button>
-                        <button class="button secondary" onclick="showFileConfig()">Show File Config</button>
-                    </div>
-
-                    <div id="file-builder"></div>
-                    <div id="file-output"></div>
+            <div class="section">
+                <h2>✅ Validation Status</h2>
+                <div class="demo-container">
+                    <div id="validation-status" class="status valid">Ready to build rules</div>
+                    <div id="validation-errors"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script type="text/babel">
-        // Mock implementation of the XML Rules Builder library
-        // In a real scenario, this would be imported from the actual library
+        // Mock implementation for demo purposes
+        // In a real scenario, you would import from the actual package
         
-        const { useState, useEffect } = React;
-        const { Box, Button, Select, MenuItem, TextField, Typography, Paper, Stack, Alert } = MaterialUI;
+        // Mock types and interfaces
+        const XmlRuleType = {
+            label: String,
+            value: String,
+            comparators: Array
+        };
 
-        // Mock types and utilities
-        const mockXmlTypes = [
+        // Mock default types
+        const defaultXmlTypes = [
             {
                 label: 'Age',
                 value: 'age',
@@ -308,6 +226,7 @@ const customTypes = [
             }
         ];
 
+        // Mock custom types
         const customTypes = [
             {
                 label: 'GPA',
@@ -315,7 +234,8 @@ const customTypes = [
                 comparators: [
                     { label: 'Greater Than', value: 'greater_than' },
                     { label: 'Less Than', value: 'less_than' },
-                    { label: 'Equals', value: 'equals' }
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Between', value: 'between' }
                 ]
             },
             {
@@ -323,18 +243,30 @@ const customTypes = [
                 value: 'course_level',
                 comparators: [
                     { label: 'Equals', value: 'equals' },
-                    { label: 'Not Equals', value: 'not_equals' }
+                    { label: 'Not Equals', value: 'not_equals' },
+                    { label: 'In', value: 'in' }
                 ]
-            }
-        ];
-
-        const fileTypes = [
+            },
             {
                 label: 'Test Score',
                 value: 'test_score',
                 comparators: [
                     { label: 'Greater Than', value: 'greater_than' },
-                    { label: 'Less Than', value: 'less_than' }
+                    { label: 'Less Than', value: 'less_than' },
+                    { label: 'Equals', value: 'equals' }
+                ]
+            }
+        ];
+
+        // Mock file-based types
+        const fileBasedTypes = [
+            {
+                label: 'Student ID',
+                value: 'student_id',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Not Equals', value: 'not_equals' },
+                    { label: 'Starts With', value: 'starts_with' }
                 ]
             },
             {
@@ -342,504 +274,296 @@ const customTypes = [
                 value: 'department',
                 comparators: [
                     { label: 'Equals', value: 'equals' },
-                    { label: 'Not Equals', value: 'not_equals' }
+                    { label: 'Not Equals', value: 'not_equals' },
+                    { label: 'In', value: 'in' }
+                ]
+            },
+            {
+                label: 'Semester',
+                value: 'semester',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Not Equals', value: 'not_equals' },
+                    { label: 'Greater Than', value: 'greater_than' },
+                    { label: 'Less Than', value: 'less_than' }
                 ]
             }
         ];
 
-        // Mock RuleBlock component
-        const RuleBlock = ({ block, path, parent, onUpdate, onAddRule, onAddGroup, onRemoveBlock, availableTypes }) => {
-            const [inputError, setInputError] = useState('');
-
-            if (block.type === 'rule') {
-                let inputType = 'text';
-                let adornment = null;
-                if (block.ruleType.value === 'age') inputType = 'number';
-                if (block.ruleType.value === 'dob') inputType = 'date';
-                if (block.ruleType.value === 'income') {
-                    inputType = 'number';
-                    adornment = '£';
-                }
-
-                const handleValueChange = (e) => {
-                    const val = e.target.value;
-                    let error = '';
-                    
-                    if (block.ruleType.value === 'age') {
-                        if (!/^\d+$/.test(val)) error = 'Age must be a whole number';
-                        if (parseInt(val, 10) < 0) error = 'Age must be positive';
-                    }
-                    if (block.ruleType.value === 'dob') {
-                        if (!/^\d{4}-\d{2}-\d{2}$/.test(val)) error = 'Date must be YYYY-MM-DD';
-                    }
-                    if (block.ruleType.value === 'income') {
-                        if (!/^\d+(\.\d{1,2})?$/.test(val)) error = 'Income must be a number';
-                    }
-                    
-                    setInputError(error);
-                    onUpdate(path, (block) => {
-                        if (block.type !== 'rule') return block;
-                        return { ...block, value: val };
-                    });
-                };
-
-                return (
-                    <Paper elevation={2} sx={{ p: 2, m: 1, borderRadius: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                        <Select
-                            value={block.ruleType.value}
-                            onChange={e => onUpdate(path, (block) => {
-                                if (block.type !== 'rule') return block;
-                                const ruleType = availableTypes.find(t => t.value === e.target.value);
-                                return {
-                                    ...block,
-                                    ruleType,
-                                    comparator: ruleType.comparators[0],
-                                    value: ''
-                                };
-                            })}
-                            size="small"
-                            sx={{ minWidth: 140 }}
-                        >
-                            {availableTypes.map(type => (
-                                <MenuItem key={type.value} value={type.value}>{type.label}</MenuItem>
-                            ))}
-                        </Select>
-                        <Select
-                            value={block.comparator?.value || ''}
-                            onChange={e => onUpdate(path, (block) => {
-                                if (block.type !== 'rule') return block;
-                                const ruleType = block.ruleType;
-                                return {
-                                    ...block,
-                                    comparator: ruleType.comparators.find(c => c.value === e.target.value)
-                                };
-                            })}
-                            size="small"
-                            sx={{ minWidth: 140 }}
-                        >
-                            {block.ruleType?.comparators.map((comp) => (
-                                <MenuItem key={comp.value} value={comp.value}>{comp.label}</MenuItem>
-                            ))}
-                        </Select>
-                        <TextField
-                            type={inputType}
-                            value={block.value}
-                            onChange={handleValueChange}
-                            size="small"
-                            error={!!inputError}
-                            helperText={inputError}
-                            sx={{ minWidth: 120 }}
-                            InputProps={adornment ? { startAdornment: adornment } : undefined}
-                        />
-                        {parent && (
-                            <Button 
-                                onClick={() => onRemoveBlock(path.slice(0, -1), path[path.length - 1])} 
-                                color="error" 
-                                variant="outlined" 
-                                size="small" 
-                                sx={{ ml: 1 }}
-                            >
-                                Remove Rule
-                            </Button>
-                        )}
-                    </Paper>
-                );
-            }
-
-            return (
-                <Paper elevation={3} sx={{ p: 2, m: 2, borderRadius: 2 }}>
-                    <Stack direction="row" alignItems="center" spacing={2} mb={2}>
-                        <Select
-                            value={block.logic}
-                            onChange={e => onUpdate(path, (block) => {
-                                if (block.type !== 'group') return block;
-                                return { ...block, logic: e.target.value };
-                            })}
-                            size="small"
-                        >
-                            <MenuItem value="AND">ALL MATCH</MenuItem>
-                            <MenuItem value="OR">ONE MATCHES</MenuItem>
-                        </Select>
-                        {parent && (
-                            <Button 
-                                onClick={() => onRemoveBlock(path.slice(0, -1), path[path.length - 1])} 
-                                color="error" 
-                                variant="outlined" 
-                                size="small"
-                            >
-                                Remove Group
-                            </Button>
-                        )}
-                    </Stack>
-                    <Box ml={2}>
-                        {block.children.map((child, i) => (
-                            <RuleBlock 
-                                key={i} 
-                                block={child} 
-                                path={[...path, i]} 
-                                parent={block}
-                                onUpdate={onUpdate}
-                                onAddRule={onAddRule}
-                                onAddGroup={onAddGroup}
-                                onRemoveBlock={onRemoveBlock}
-                                availableTypes={availableTypes}
-                            />
-                        ))}
-                    </Box>
-                    <Stack direction="row" spacing={2} mt={2}>
-                        <Button 
-                            onClick={() => onAddRule(path, block.children.length - 1)} 
-                            variant="contained" 
-                            size="small"
-                        >
-                            Add Rule
-                        </Button>
-                        <Button 
-                            onClick={() => onAddGroup(path, block.children.length - 1)} 
-                            variant="contained" 
-                            size="small"
-                        >
-                            Add Group
-                        </Button>
-                    </Stack>
-                </Paper>
-            );
-        };
+        // Current types state
+        let currentTypes = [...defaultXmlTypes];
+        let currentConfigName = 'Default XML Types';
 
         // Mock XmlRuleBuilder component
-        const XmlRuleBuilder = ({ onXmlChange, initialRules, onValidationChange, config }) => {
-            const [root, setRoot] = useState(initialRules || {
-                type: 'group',
-                logic: 'AND',
-                children: [{
-                    type: 'rule',
-                    ruleType: (config?.xmlTypes || mockXmlTypes)[0],
-                    comparator: (config?.xmlTypes || mockXmlTypes)[0].comparators[0],
-                    value: ''
-                }]
-            });
-            const [xml, setXml] = useState('');
-            const [validation, setValidation] = useState({ isValid: false, errors: [] });
-
-            const availableTypes = config?.xmlTypes || mockXmlTypes;
-
-            useEffect(() => {
-                if (initialRules) {
-                    setRoot(initialRules);
+        function XmlRuleBuilder({ config, onXmlChange, onValidationChange }) {
+            const [rules, setRules] = React.useState([
+                {
+                    type: 'group',
+                    logic: 'AND',
+                    children: [
+                        {
+                            type: 'rule',
+                            ruleType: config?.xmlTypes?.[0] || currentTypes[0],
+                            comparator: (config?.xmlTypes?.[0] || currentTypes[0]).comparators[0],
+                            value: ''
+                        }
+                    ]
                 }
-            }, [initialRules]);
+            ]);
 
-            useEffect(() => {
-                // Simple validation
-                const errors = [];
-                function validateBlock(block, path = 'root') {
-                    if (block.type === 'rule') {
-                        if (!block.value || block.value.trim() === '') {
-                            errors.push(`${path}: Rule value is required`);
+            const [xml, setXml] = React.useState('');
+            const [isValid, setIsValid] = React.useState(true);
+            const [errors, setErrors] = React.useState([]);
+
+            React.useEffect(() => {
+                // Mock XML generation
+                const generateXml = () => {
+                    if (!rules || rules.length === 0) return '';
+                    
+                    const rule = rules[0];
+                    if (rule.type === 'group' && rule.children && rule.children.length > 0) {
+                        const childRule = rule.children[0];
+                        if (childRule.type === 'rule' && childRule.value) {
+                            return `<rules>\n  <group logic="${rule.logic}">\n    <${childRule.ruleType.value} comparator="${childRule.comparator.value}">${childRule.value}</${childRule.ruleType.value}>\n  </group>\n</rules>`;
                         }
-                    } else {
-                        if (block.children.length === 0) {
-                            errors.push(`${path}: Group must have at least one child`);
-                        }
-                        block.children.forEach((child, index) => {
-                            validateBlock(child, `${path}.children[${index}]`);
-                        });
                     }
-                }
-                
-                validateBlock(root);
-                const isValid = errors.length === 0;
-                setValidation({ isValid, errors });
-                
-                if (onValidationChange) {
-                    onValidationChange(isValid, errors);
-                }
-            }, [root, onValidationChange]);
+                    return '';
+                };
 
-            useEffect(() => {
-                if (validation.isValid) {
-                    // Generate XML
-                    function generateXml(block) {
-                        if (block.type === 'rule') {
-                            return `<${block.ruleType.value} comparator="${block.comparator.value}">${block.value}</${block.ruleType.value}>`;
-                        } else {
-                            const children = block.children.map(generateXml).join('\n  ');
-                            return `<group logic="${block.logic}">\n  ${children}\n</group>`;
-                        }
+                const newXml = generateXml();
+                setXml(newXml);
+                onXmlChange?.(newXml);
+
+                // Mock validation
+                const validationErrors = [];
+                if (rules[0]?.children?.[0]?.type === 'rule' && !rules[0].children[0].value) {
+                    validationErrors.push('Rule value is required');
+                }
+
+                const newIsValid = validationErrors.length === 0;
+                setIsValid(newIsValid);
+                setErrors(validationErrors);
+                onValidationChange?.(newIsValid, validationErrors);
+            }, [rules, onXmlChange, onValidationChange]);
+
+            const updateRule = (path, updater) => {
+                setRules(prevRules => {
+                    const newRules = [...prevRules];
+                    let current = newRules;
+                    
+                    for (let i = 0; i < path.length - 1; i++) {
+                        current = current[path[i]].children;
                     }
                     
-                    const generatedXml = `<rules>\n  ${generateXml(root)}\n</rules>`;
-                    setXml(generatedXml);
-                    if (onXmlChange) {
-                        onXmlChange(generatedXml);
-                    }
-                }
-            }, [root, validation.isValid, onXmlChange]);
-
-            const handleUpdate = (path, updater) => {
-                function updateBlockByPath(block, path, updater) {
-                    if (path.length === 0) return updater(block);
-                    if (block.type !== 'group') return block;
+                    const lastIndex = path[path.length - 1];
+                    current[lastIndex] = updater(current[lastIndex]);
                     
-                    const [head, ...rest] = path;
-                    return {
-                        ...block,
-                        children: block.children.map((child, idx) =>
-                            idx === head ? updateBlockByPath(child, rest, updater) : child
-                        )
-                    };
-                }
-                
-                setRoot(updateBlockByPath(root, path, updater));
+                    return newRules;
+                });
             };
 
-            const handleAddRule = (path, index) => {
-                setRoot(prevRoot => {
-                    function updateBlockByPath(block, path, updater) {
-                        if (path.length === 0) return updater(block);
-                        if (block.type !== 'group') return block;
-                        
-                        const [head, ...rest] = path;
-                        return {
-                            ...block,
-                            children: block.children.map((child, idx) =>
-                                idx === head ? updateBlockByPath(child, rest, updater) : child
-                            )
-                        };
-                    }
-                    
-                    return updateBlockByPath(prevRoot, path, (block) => {
-                        if (block.type !== 'group') return block;
-                        const children = [...block.children];
-                        children.splice(index + 1, 0, {
+            const addRule = () => {
+                setRules(prevRules => {
+                    const newRules = [...prevRules];
+                    const group = newRules[0];
+                    group.children.push({
+                        type: 'rule',
+                        ruleType: currentTypes[0],
+                        comparator: currentTypes[0].comparators[0],
+                        value: ''
+                    });
+                    return newRules;
+                });
+            };
+
+            const removeRule = (index) => {
+                setRules(prevRules => {
+                    const newRules = [...prevRules];
+                    const group = newRules[0];
+                    group.children.splice(index, 1);
+                    if (group.children.length === 0) {
+                        group.children.push({
                             type: 'rule',
-                            ruleType: availableTypes[0],
-                            comparator: availableTypes[0].comparators[0],
+                            ruleType: currentTypes[0],
+                            comparator: currentTypes[0].comparators[0],
                             value: ''
                         });
-                        return { ...block, children };
-                    });
+                    }
+                    return newRules;
                 });
             };
 
-            const handleAddGroup = (path, index) => {
-                setRoot(prevRoot => {
-                    function updateBlockByPath(block, path, updater) {
-                        if (path.length === 0) return updater(block);
-                        if (block.type !== 'group') return block;
-                        
-                        const [head, ...rest] = path;
-                        return {
-                            ...block,
-                            children: block.children.map((child, idx) =>
-                                idx === head ? updateBlockByPath(child, rest, updater) : child
-                            )
-                        };
-                    }
-                    
-                    return updateBlockByPath(prevRoot, path, (block) => {
-                        if (block.type !== 'group') return block;
-                        const children = [...block.children];
-                        children.splice(index + 1, 0, {
-                            type: 'group',
-                            logic: 'AND',
-                            children: [{
-                                type: 'rule',
-                                ruleType: availableTypes[0],
-                                comparator: availableTypes[0].comparators[0],
-                                value: ''
-                            }]
-                        });
-                        return { ...block, children };
-                    });
-                });
-            };
-
-            const handleRemoveBlock = (path, index) => {
-                setRoot(prevRoot => {
-                    function updateBlockByPath(block, path, updater) {
-                        if (path.length === 0) return updater(block);
-                        if (block.type !== 'group') return block;
-                        
-                        const [head, ...rest] = path;
-                        return {
-                            ...block,
-                            children: block.children.map((child, idx) =>
-                                idx === head ? updateBlockByPath(child, rest, updater) : child
-                            )
-                        };
-                    }
-                    
-                    return updateBlockByPath(prevRoot, path.slice(0, -1), (block) => {
-                        if (block.type !== 'group' || block.children.length <= 1) return block;
-                        const children = block.children.filter((_, i) => i !== index);
-                        return { ...block, children };
-                    });
-                });
+            const renderRule = (rule, index, path = [0]) => {
+                if (rule.type === 'rule') {
+                    return (
+                        <div key={index} style={{ margin: '10px 0', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
+                                <select 
+                                    value={rule.ruleType.value}
+                                    onChange={(e) => {
+                                        const newType = currentTypes.find(t => t.value === e.target.value);
+                                        updateRule([...path, index], { ...rule, ruleType: newType, comparator: newType.comparators[0] });
+                                    }}
+                                    style={{ padding: '5px', borderRadius: '4px' }}
+                                >
+                                    {currentTypes.map(type => (
+                                        <option key={type.value} value={type.value}>{type.label}</option>
+                                    ))}
+                                </select>
+                                
+                                <select 
+                                    value={rule.comparator.value}
+                                    onChange={(e) => {
+                                        const newComparator = rule.ruleType.comparators.find(c => c.value === e.target.value);
+                                        updateRule([...path, index], { ...rule, comparator: newComparator });
+                                    }}
+                                    style={{ padding: '5px', borderRadius: '4px' }}
+                                >
+                                    {rule.ruleType.comparators.map(comp => (
+                                        <option key={comp.value} value={comp.value}>{comp.label}</option>
+                                    ))}
+                                </select>
+                                
+                                <input 
+                                    type="text" 
+                                    value={rule.value}
+                                    onChange={(e) => updateRule([...path, index], { ...rule, value: e.target.value })}
+                                    placeholder="Enter value"
+                                    style={{ padding: '5px', borderRadius: '4px', border: '1px solid #ccc' }}
+                                />
+                                
+                                <button 
+                                    onClick={() => removeRule(index)}
+                                    style={{ padding: '5px 10px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                                >
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    );
+                }
+                
+                return null;
             };
 
             return (
-                <Box sx={{ p: 2 }}>
-                    <Typography variant="h5" gutterBottom>
-                        XML Rule Builder
-                    </Typography>
+                <div>
+                    <div style={{ marginBottom: '20px' }}>
+                        <h3>Rule Builder</h3>
+                        <p>Available types: {currentTypes.map(t => t.label).join(', ')}</p>
+                    </div>
                     
-                    {!validation.isValid && validation.errors.length > 0 && (
-                        <Alert severity="warning" sx={{ mb: 2 }}>
-                            <Typography variant="subtitle2" gutterBottom>
-                                Validation Errors:
-                            </Typography>
-                            {validation.errors.map((error, index) => (
-                                <Typography key={index} variant="body2">
-                                    • {error}
-                                </Typography>
-                            ))}
-                        </Alert>
-                    )}
-
-                    <RuleBlock 
-                        block={root} 
-                        path={[]} 
-                        parent={null}
-                        onUpdate={handleUpdate}
-                        onAddRule={handleAddRule}
-                        onAddGroup={handleAddGroup}
-                        onRemoveBlock={handleRemoveBlock}
-                        availableTypes={availableTypes}
-                    />
-
-                    {validation.isValid && xml && (
-                        <Paper elevation={1} sx={{ p: 2, mt: 2, backgroundColor: '#f5f5f5' }}>
-                            <Typography variant="h6" gutterBottom>
-                                Generated XML:
-                            </Typography>
-                            <Box component="pre" sx={{ 
-                                backgroundColor: '#fff', 
-                                p: 2, 
-                                borderRadius: 1, 
-                                overflow: 'auto',
-                                fontSize: '0.875rem',
-                                border: '1px solid #ddd'
-                            }}>
-                                {xml}
-                            </Box>
-                        </Paper>
-                    )}
-                </Box>
+                    <div style={{ marginBottom: '20px' }}>
+                        <label>
+                            Group Logic:
+                            <select 
+                                value={rules[0]?.logic || 'AND'}
+                                onChange={(e) => updateRule([0], { ...rules[0], logic: e.target.value })}
+                                style={{ marginLeft: '10px', padding: '5px', borderRadius: '4px' }}
+                            >
+                                <option value="AND">AND</option>
+                                <option value="OR">OR</option>
+                            </select>
+                        </label>
+                    </div>
+                    
+                    <div style={{ marginBottom: '20px' }}>
+                        {rules[0]?.children?.map((rule, index) => renderRule(rule, index))}
+                    </div>
+                    
+                    <button 
+                        onClick={addRule}
+                        style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                        Add Rule
+                    </button>
+                </div>
             );
-        };
+        }
 
-        // Global variables for demo
-        let currentTypes = [...mockXmlTypes];
-        let currentOutput = '';
+        // Main demo component
+        function Demo() {
+            const [xml, setXml] = React.useState('');
+            const [isValid, setIsValid] = React.useState(true);
+            const [errors, setErrors] = React.useState([]);
 
-        // Demo functions
-        window.loadDefaultTypes = function() {
-            currentTypes = [...mockXmlTypes];
-            ReactDOM.render(
+            return (
                 <XmlRuleBuilder 
-                    onXmlChange={(xml) => {
-                        currentOutput = xml;
-                        document.getElementById('default-output').innerHTML = `
-                            <div class="success">XML generated successfully!</div>
-                            <div class="xml-output">${xml}</div>
-                        `;
+                    onXmlChange={setXml}
+                    onValidationChange={(valid, errorList) => {
+                        setIsValid(valid);
+                        setErrors(errorList);
                     }}
-                    onValidationChange={(isValid, errors) => {
-                        if (!isValid) {
-                            document.getElementById('default-output').innerHTML = `
-                                <div class="error">Validation errors: ${errors.join(', ')}</div>
-                            `;
-                        }
-                    }}
-                />,
-                document.getElementById('default-builder')
+                />
             );
-        };
+        }
 
-        window.showDefaultConfig = function() {
-            document.getElementById('default-output').innerHTML = `
-                <div class="config-example">${JSON.stringify(mockXmlTypes, null, 2)}</div>
-            `;
-        };
+        // Render the demo
+        ReactDOM.render(<Demo />, document.getElementById('rule-builder'));
 
-        window.loadCustomTypes = function() {
+        // Configuration functions
+        function useDefaultTypes() {
+            currentTypes = [...defaultXmlTypes];
+            currentConfigName = 'Default XML Types';
+            updateConfigDisplay();
+            ReactDOM.render(<Demo />, document.getElementById('rule-builder'));
+        }
+
+        function useCustomTypes() {
             currentTypes = [...customTypes];
-            ReactDOM.render(
-                <XmlRuleBuilder 
-                    config={{ xmlTypes: customTypes }}
-                    onXmlChange={(xml) => {
-                        currentOutput = xml;
-                        document.getElementById('custom-output').innerHTML = `
-                            <div class="success">XML generated successfully!</div>
-                            <div class="xml-output">${xml}</div>
-                        `;
-                    }}
-                    onValidationChange={(isValid, errors) => {
-                        if (!isValid) {
-                            document.getElementById('custom-output').innerHTML = `
-                                <div class="error">Validation errors: ${errors.join(', ')}</div>
-                            `;
-                        }
-                    }}
-                />,
-                document.getElementById('custom-builder')
-            );
+            currentConfigName = 'Custom Types (GPA, Course Level, Test Score)';
+            updateConfigDisplay();
+            ReactDOM.render(<Demo />, document.getElementById('rule-builder'));
+        }
+
+        function useFileBasedTypes() {
+            currentTypes = [...fileBasedTypes];
+            currentConfigName = 'File-Based Types (Student ID, Department, Semester)';
+            updateConfigDisplay();
+            ReactDOM.render(<Demo />, document.getElementById('rule-builder'));
+        }
+
+        function addToExistingTypes() {
+            currentTypes = [...defaultXmlTypes, ...customTypes];
+            currentConfigName = 'Combined Types (Default + Custom)';
+            updateConfigDisplay();
+            ReactDOM.render(<Demo />, document.getElementById('rule-builder'));
+        }
+
+        function resetToDefaults() {
+            currentTypes = [...defaultXmlTypes];
+            currentConfigName = 'Default XML Types (Reset)';
+            updateConfigDisplay();
+            ReactDOM.render(<Demo />, document.getElementById('rule-builder'));
+        }
+
+        function updateConfigDisplay() {
+            const display = document.getElementById('config-display');
+            display.innerHTML = `<strong>Current Configuration:</strong> ${currentConfigName}\n\n<strong>Available Types:</strong>\n${currentTypes.map(t => `- ${t.label} (${t.value})`).join('\n')}`;
+        }
+
+        // Global functions for XML and validation updates
+        window.updateXmlOutput = function(xml) {
+            document.getElementById('xml-output').textContent = xml || 'No XML generated yet. Start building rules above!';
         };
 
-        window.resetToDefault = function() {
-            currentTypes = [...mockXmlTypes];
-            document.getElementById('custom-output').innerHTML = `
-                <div class="success">Reset to default types successfully!</div>
-            `;
+        window.updateValidationStatus = function(isValid, errors) {
+            const statusEl = document.getElementById('validation-status');
+            const errorsEl = document.getElementById('validation-errors');
+            
+            if (isValid) {
+                statusEl.className = 'status valid';
+                statusEl.textContent = '✓ Rules are valid';
+                errorsEl.innerHTML = '';
+            } else {
+                statusEl.className = 'status invalid';
+                statusEl.textContent = '✗ Rules have validation errors';
+                errorsEl.innerHTML = errors.map(error => `<div>• ${error}</div>`).join('');
+            }
         };
 
-        window.loadFromFile = function() {
-            currentTypes = [...fileTypes];
-            ReactDOM.render(
-                <XmlRuleBuilder 
-                    config={{ xmlTypes: fileTypes }}
-                    onXmlChange={(xml) => {
-                        currentOutput = xml;
-                        document.getElementById('file-output').innerHTML = `
-                            <div class="success">XML generated successfully!</div>
-                            <div class="xml-output">${xml}</div>
-                        `;
-                    }}
-                    onValidationChange={(isValid, errors) => {
-                        if (!isValid) {
-                            document.getElementById('file-output').innerHTML = `
-                                <div class="error">Validation errors: ${errors.join(', ')}</div>
-                            `;
-                        }
-                    }}
-                />,
-                document.getElementById('file-builder')
-            );
-        };
-
-        window.showFileConfig = function() {
-            document.getElementById('file-output').innerHTML = `
-                <div class="config-example">${JSON.stringify({ ruleTypes: fileTypes }, null, 2)}</div>
-            `;
-        };
-
-        window.switchTab = function(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            // Show selected tab
-            document.getElementById(tabName + '-tab').classList.add('active');
-            event.target.classList.add('active');
-        };
-
-        // Initialize default demo
-        window.loadDefaultTypes();
+        // Initialize
+        updateConfigDisplay();
     </script>
 </body>
 </html> 

@@ -3,7 +3,7 @@ import {
   rulesToXml, 
   validateRuleBlock, 
   createDefaultGroup
-} from '../src/index';
+} from 'xml-rulekit';
 
 // Example 1: Parse XML to rules
 const xmlString = `

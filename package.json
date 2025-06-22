@@ -1,29 +1,44 @@
 {
-  "name": "xml-rules-builder",
+  "name": "xml-rulekit",
   "version": "0.1.0",
-  "description": "A TypeScript library for building and managing XML-based rule systems",
+  "description": "A TypeScript toolkit for building and managing XML-based rule systems with React components",
   "main": "dist/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "lint": "npx eslint src --ext .ts,.tsx",
     "test": "vitest",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build && npm run lint",
+    "prepack": "npm run build"
   },
   "keywords": [
     "xml",
     "rules",
     "typescript",
+    "react",
     "validation",
     "business-logic",
-    "react"
+    "rule-builder",
+    "xml-generator",
+    "logic-builder"
   ],
   "author": "Your Name",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/xml-rulekit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/xml-rulekit/issues"
+  },
+  "homepage": "https://github.com/yourusername/xml-rulekit#readme",
   "peerDependencies": {
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
