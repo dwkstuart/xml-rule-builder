@@ -164,6 +164,7 @@
                 <div class="tab active" onclick="switchTab('default')">Default Types</div>
                 <div class="tab" onclick="switchTab('custom')">Custom Types</div>
                 <div class="tab" onclick="switchTab('file')">File Configuration</div>
+                <div class="tab" onclick="switchTab('import')">XML Import</div>
             </div>
 
             <div id="default-tab" class="tab-content active">
@@ -254,6 +255,36 @@ const customTypes = [
 
                     <div id="file-builder"></div>
                     <div id="file-output"></div>
+                </div>
+            </div>
+
+            <div id="import-tab" class="tab-content">
+                <div class="demo-section">
+                    <h2>XML Import Demo</h2>
+                    <p>This demo shows how to import existing XML and populate the rules builder for editing.</p>
+                    
+                    <div class="config-example">
+// Example XML to import:
+&lt;rules&gt;
+  &lt;group logic="AND"&gt;
+    &lt;age comparator="greater_than"&gt;25&lt;/age&gt;
+    &lt;income comparator="less_than"&gt;50000&lt;/income&gt;
+  &lt;/group&gt;
+  &lt;group logic="OR"&gt;
+    &lt;gender comparator="equals"&gt;female&lt;/gender&gt;
+    &lt;nationality comparator="equals"&gt;UK&lt;/nationality&gt;
+  &lt;/group&gt;
+&lt;/rules&gt;
+                    </div>
+
+                    <div class="button-group">
+                        <button class="button" onclick="loadSampleXml()">Load Sample XML</button>
+                        <button class="button secondary" onclick="loadCustomXml()">Load Custom XML</button>
+                        <button class="button" onclick="clearImport()">Clear</button>
+                    </div>
+
+                    <div id="import-builder"></div>
+                    <div id="import-output"></div>
                 </div>
             </div>
         </div>
@@ -402,6 +433,95 @@ const customTypes = [
                 ]
             }
         ];
+
+        // Sample XML for import demo
+        const sampleXml = `<rules>
+  <group logic="AND">
+    <age comparator="greater_than">25</age>
+    <income comparator="less_than">50000</income>
+  </group>
+  <group logic="OR">
+    <gender comparator="equals">female</gender>
+    <nationality comparator="equals">UK</nationality>
+  </group>
+</rules>`;
+
+        // Function to parse XML and convert to rule blocks
+        function parseXmlToRules(xmlString, availableTypes) {
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+                
+                if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
+                    throw new Error('Invalid XML format');
+                }
+
+                const rulesElement = xmlDoc.querySelector('rules');
+                if (!rulesElement) {
+                    throw new Error('No <rules> element found');
+                }
+
+                function parseElement(element) {
+                    if (element.tagName === 'group') {
+                        const logic = element.getAttribute('logic') || 'AND';
+                        const children = Array.from(element.children).map(parseElement);
+                        return {
+                            type: 'group',
+                            logic: logic,
+                            children: children
+                        };
+                    } else {
+                        // It's a rule element
+                        const ruleType = element.tagName;
+                        const comparator = element.getAttribute('comparator') || 'equals';
+                        const value = element.textContent || '';
+                        
+                        // Find the matching rule type from available types
+                        const matchingType = availableTypes.find(t => t.value === ruleType);
+                        if (!matchingType) {
+                            throw new Error(`Unknown rule type: ${ruleType}`);
+                        }
+                        
+                        // Find the matching comparator
+                        const matchingComparator = matchingType.comparators.find(c => c.value === comparator);
+                        if (!matchingComparator) {
+                            throw new Error(`Unknown comparator: ${comparator} for rule type: ${ruleType}`);
+                        }
+                        
+                        return {
+                            type: 'rule',
+                            ruleType: matchingType,
+                            comparator: matchingComparator,
+                            value: value
+                        };
+                    }
+                }
+
+                const rootElement = rulesElement.children[0];
+                if (!rootElement) {
+                    throw new Error('No root element found in rules');
+                }
+
+                // If the root element is already a group, return it directly
+                if (rootElement.tagName === 'group') {
+                    return parseElement(rootElement);
+                }
+                
+                // If the root element is a rule, wrap it in a group
+                if (rootElement.tagName !== 'group') {
+                    return {
+                        type: 'group',
+                        logic: 'AND',
+                        children: [parseElement(rootElement)]
+                    };
+                }
+
+                return parseElement(rootElement);
+            } catch (error) {
+                console.error('Error parsing XML:', error);
+                throw error;
+            }
+        }
 
         // Mock RuleBlock component
         const RuleBlock = ({ block, path, parent, onUpdate, onAddRule, onAddGroup, onRemoveBlock, availableTypes }) => {
@@ -902,6 +1022,98 @@ const customTypes = [
         window.showFileConfig = function() {
             document.getElementById('file-output').innerHTML = `
                 <div class="config-example">${JSON.stringify({ ruleTypes: fileTypes }, null, 2)}</div>
+            `;
+        };
+
+        window.loadSampleXml = function() {
+            try {
+                const initialRules = parseXmlToRules(sampleXml, mockXmlTypes);
+                console.log('Parsed initial rules:', initialRules);
+                
+                ReactDOM.render(
+                    <XmlRuleBuilder 
+                        initialRules={initialRules}
+                        onXmlChange={(xml) => {
+                            currentOutput = xml;
+                            const outputDiv = document.getElementById('import-output');
+                            outputDiv.innerHTML = `
+                                <div class="success">XML imported and updated successfully!</div>
+                                <div class="xml-output"></div>
+                            `;
+                            const xmlOutputDiv = outputDiv.querySelector('.xml-output');
+                            xmlOutputDiv.textContent = xml;
+                        }}
+                        onValidationChange={(isValid, errors) => {
+                            if (!isValid) {
+                                document.getElementById('import-output').innerHTML = `
+                                    <div class="error">Validation errors: ${errors.join(', ')}</div>
+                                `;
+                            }
+                        }}
+                    />,
+                    document.getElementById('import-builder')
+                );
+                
+                document.getElementById('import-output').innerHTML = `
+                    <div class="success">Sample XML loaded successfully! The rules builder should now show the imported rules above.</div>
+                    <div class="config-example">${sampleXml}</div>
+                `;
+            } catch (error) {
+                console.error('Error in loadSampleXml:', error);
+                document.getElementById('import-output').innerHTML = `
+                    <div class="error">Error loading sample XML: ${error.message}</div>
+                `;
+            }
+        };
+
+        window.loadCustomXml = function() {
+            const customXml = prompt('Enter your XML:', sampleXml);
+            if (!customXml) return;
+            
+            try {
+                const initialRules = parseXmlToRules(customXml, mockXmlTypes);
+                console.log('Parsed custom initial rules:', initialRules);
+                
+                ReactDOM.render(
+                    <XmlRuleBuilder 
+                        initialRules={initialRules}
+                        onXmlChange={(xml) => {
+                            currentOutput = xml;
+                            const outputDiv = document.getElementById('import-output');
+                            outputDiv.innerHTML = `
+                                <div class="success">Custom XML imported and updated successfully!</div>
+                                <div class="xml-output"></div>
+                            `;
+                            const xmlOutputDiv = outputDiv.querySelector('.xml-output');
+                            xmlOutputDiv.textContent = xml;
+                        }}
+                        onValidationChange={(isValid, errors) => {
+                            if (!isValid) {
+                                document.getElementById('import-output').innerHTML = `
+                                    <div class="error">Validation errors: ${errors.join(', ')}</div>
+                                `;
+                            }
+                        }}
+                    />,
+                    document.getElementById('import-builder')
+                );
+                
+                document.getElementById('import-output').innerHTML = `
+                    <div class="success">Custom XML loaded successfully! The rules builder should now show the imported rules above.</div>
+                    <div class="config-example">${customXml}</div>
+                `;
+            } catch (error) {
+                console.error('Error in loadCustomXml:', error);
+                document.getElementById('import-output').innerHTML = `
+                    <div class="error">Error loading custom XML: ${error.message}</div>
+                `;
+            }
+        };
+
+        window.clearImport = function() {
+            document.getElementById('import-builder').innerHTML = '';
+            document.getElementById('import-output').innerHTML = `
+                <div class="success">Import cleared successfully!</div>
             `;
         };
 
