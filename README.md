@@ -1,6 +1,6 @@
-# XML RuleKit
+# XML Rules Builder
 
-A TypeScript toolkit for building and managing XML-based rule systems, with optional React components for UI integration.
+A TypeScript library for building and managing XML-based rule systems, with optional React components for UI integration.
 
 ## Features
 
@@ -14,7 +14,7 @@ A TypeScript toolkit for building and managing XML-based rule systems, with opti
 ## Installation
 
 ```bash
-npm install xml-rulekit
+npm install xml-rules-builder
 ```
 
 ## Usage
@@ -28,7 +28,7 @@ import {
   validateRuleBlock, 
   createDefaultGroup,
   type RuleBlock 
-} from 'xml-rulekit';
+} from 'xml-rules-builder';
 
 // Convert XML to rule structure
 const xmlString = `<rules><group logic="AND"><age comparator="greater_than">18</age></group></rules>`;
@@ -54,7 +54,7 @@ The library allows you to define custom rule types and comparators:
 #### Method 1: Set custom types directly
 
 ```typescript
-import { setXmlTypes, type XmlRuleType } from 'xml-rulekit';
+import { setXmlTypes, type XmlRuleType } from 'xml-rules-builder';
 
 const customTypes: XmlRuleType[] = [
   {
@@ -82,7 +82,7 @@ setXmlTypes(customTypes);
 #### Method 2: Load from configuration object
 
 ```typescript
-import { loadXmlTypesFromConfig, type XmlTypesConfig } from 'xml-rulekit';
+import { loadXmlTypesFromConfig, type XmlTypesConfig } from 'xml-rules-builder';
 
 const config: XmlTypesConfig = {
   ruleTypes: [
@@ -104,7 +104,7 @@ loadXmlTypesFromConfig(config);
 #### Method 3: Load from configuration file
 
 ```typescript
-import { loadXmlTypesFromFile } from 'xml-rulekit';
+import { loadXmlTypesFromFile } from 'xml-rules-builder';
 
 // Load from a JSON file
 await loadXmlTypesFromFile('./config/xml-types.json');
@@ -138,7 +138,7 @@ Configuration file format (`xml-types.json`):
 #### Method 4: Add to existing types
 
 ```typescript
-import { addXmlTypes } from 'xml-rulekit';
+import { addXmlTypes } from 'xml-rules-builder';
 
 const additionalTypes = [
   {
@@ -157,7 +157,7 @@ addXmlTypes(additionalTypes);
 #### Reset to default types
 
 ```typescript
-import { resetToDefaultTypes } from 'xml-rulekit';
+import { resetToDefaultTypes } from 'xml-rules-builder';
 
 resetToDefaultTypes();
 ```
@@ -165,7 +165,7 @@ resetToDefaultTypes();
 ### React Components
 
 ```typescript
-import { XmlRuleBuilder } from 'xml-rulekit';
+import { XmlRuleBuilder } from 'xml-rules-builder';
 
 function MyComponent() {
   const handleXmlChange = (xml: string) => {
@@ -364,10 +364,6 @@ The library includes default rule types that can be replaced or extended:
   </group>
 </rules>
 ```
-
-## Demo
-
-Check out the interactive demo at `examples/demo-page.html` to see XML RuleKit in action!
 
 ## Development
 

@@ -9,7 +9,7 @@ import {
   validateRuleBlock,
   type XmlRuleType,
   type XmlTypesConfig
-} from 'xml-rulekit';
+} from '../src/index';
 
 // Example 1: Set custom types directly
 const customTypes: XmlRuleType[] = [
@@ -114,7 +114,7 @@ loadFromFile();
 // Example 9: React component usage (for reference)
 // In a React component, you would use it like this:
 /*
-import { XmlRuleBuilder } from 'xml-rulekit';
+import { XmlRuleBuilder } from 'xml-rules-builder';
 
 function MyComponent() {
   const customConfig = {
