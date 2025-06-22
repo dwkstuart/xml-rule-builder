@@ -39,8 +39,8 @@
         "business-logic",
         "validation"
     ],
-    "author": "Your Name",
-    "license": "MIT",
+    "author": "David Stuart",
+    "license": "GPL-3.0",
     "repository": {
         "type": "git",
         "url": "https://github.com/dwkstuart/xml-rule-builder"

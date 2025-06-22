@@ -1,0 +1,59 @@
+# Source files (not needed in package)
+src/
+examples/
+
+# Development files
+.github/
+.cursor/
+.cursorrules
+.cursorrules.json
+
+# Build and development files
+tsconfig.json
+eslint.config.mjs
+eslint.config.js
+.eslintrc*
+.prettierrc*
+.editorconfig
+
+# Documentation (keep README and LICENSE)
+PUBLISHING.md
+RELEASE_CHECKLIST.md
+CHANGELOG.md
+
+# Development dependencies
+node_modules/
+
+# Git files
+.git/
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test files
+coverage/
+.nyc_output/
+*.test.js
+*.test.ts
+*.test.tsx
+*.spec.js
+*.spec.ts
+*.spec.tsx
+
+# Temporary files
+*.tmp
+*.temp 
