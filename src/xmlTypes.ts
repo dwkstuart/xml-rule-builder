@@ -27,7 +27,35 @@ const defaultXmlTypes: XmlRuleType[] = [
     ]
   },
   {
-    label: 'Household Income',
+    label: 'Email',
+    value: 'email',
+    comparators: [
+      { label: 'Equals', value: 'equals' },
+      { label: 'Contains', value: 'contains' },
+      { label: 'Ends With', value: 'ends_with' },
+      { label: 'Domain', value: 'domain' }
+    ]
+  },
+  {
+    label: 'Postcode',
+    value: 'postcode',
+    comparators: [
+      { label: 'Equals', value: 'equals' },
+      { label: 'Starts With', value: 'starts_with' },
+      { label: 'In Area', value: 'in_area' }
+    ]
+  },
+  {
+    label: 'Zipcode',
+    value: 'zipcode',
+    comparators: [
+      { label: 'Equals', value: 'equals' },
+      { label: 'Starts With', value: 'starts_with' },
+      { label: 'In Area', value: 'in_area' }
+    ]
+  },
+  {
+    label: 'Income',
     value: 'income',
     comparators: [
       { label: 'Less Than', value: 'less_than' },
@@ -37,11 +65,39 @@ const defaultXmlTypes: XmlRuleType[] = [
     ]
   },
   {
-    label: 'Enrolment Status',
-    value: 'enrolment_status',
+    label: 'Gender',
+    value: 'gender',
     comparators: [
       { label: 'Equals', value: 'equals' },
-      { label: 'Not Equals', value: 'not_equals' }
+      { label: 'Not Equals', value: 'not_equals' },
+      { label: 'In', value: 'in' }
+    ]
+  },
+  {
+    label: 'Relationship Status',
+    value: 'relationship_status',
+    comparators: [
+      { label: 'Equals', value: 'equals' },
+      { label: 'Not Equals', value: 'not_equals' },
+      { label: 'In', value: 'in' }
+    ]
+  },
+  {
+    label: 'Nationality',
+    value: 'nationality',
+    comparators: [
+      { label: 'Equals', value: 'equals' },
+      { label: 'Not Equals', value: 'not_equals' },
+      { label: 'In', value: 'in' }
+    ]
+  },
+  {
+    label: 'Disabilities',
+    value: 'disabilities',
+    comparators: [
+      { label: 'Has', value: 'has' },
+      { label: 'Does Not Have', value: 'does_not_have' },
+      { label: 'Count', value: 'count' }
     ]
   }
 ];
