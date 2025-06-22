@@ -1,8 +1,20 @@
 // xmlTypes.ts
 // Contains the xmlTypes array and related export for use throughout the app
-// This is read-only and cannot be modified by users
+// This is configurable by users
 
-export const xmlTypes = [
+export interface XmlRuleType {
+  label: string;
+  value: string;
+  comparators: XmlComparator[];
+}
+
+export interface XmlComparator {
+  label: string;
+  value: string;
+}
+
+// Default xmlTypes that can be modified by users
+export let xmlTypes: XmlRuleType[] = [
   {
     label: 'Age',
     value: 'age',
@@ -41,9 +53,33 @@ export const xmlTypes = [
       { label: 'Not Equals', value: 'not_equals' }
     ]
   }
-] as const;
+];
 
-// Backward compatibility - readonly version
+// Functions to configure xmlTypes
+export function setXmlTypes(types: XmlRuleType[]): void {
+  xmlTypes = [...types];
+}
+
+export function addXmlType(type: XmlRuleType): void {
+  xmlTypes.push(type);
+}
+
+export function removeXmlType(value: string): void {
+  xmlTypes = xmlTypes.filter(t => t.value !== value);
+}
+
+export function updateXmlType(value: string, updatedType: XmlRuleType): void {
+  const index = xmlTypes.findIndex(t => t.value === value);
+  if (index !== -1) {
+    xmlTypes[index] = updatedType;
+  }
+}
+
+export function getXmlTypes(): XmlRuleType[] {
+  return [...xmlTypes];
+}
+
+// Backward compatibility - readonly version (deprecated)
 export const xmlTypesConst = xmlTypes;
 
 // Type for the xmlTypes array

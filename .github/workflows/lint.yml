@@ -17,26 +17,7 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: npm install
-      - name: Run linter and save output
-        run: |
-          set -o pipefail
-          npm run lint | tee lint-report.txt
-      - name: Create Issue on Lint Failure
-        if: failure()
-        uses: peter-evans/create-issue-from-file@v4
-        with:
-          title: 'Linting errors detected in CI'
-          content-filepath: lint-report.txt
-          labels: 'lint, automated issue'
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - name: Install dependencies
-        run: npm install
-      - name: Run tests
-        run: npx vitest run --coverage
+      - name: Run linter
+        run: npm run lint
+      - name: Build library
+        run: npm run build

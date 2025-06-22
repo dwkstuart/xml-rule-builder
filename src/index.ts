@@ -18,6 +18,13 @@ export {
 // React components (optional - for UI usage)
 export { default as XmlRuleBuilder } from './components/XmlRuleBuilder';
 
-// Constants (read-only)
+// Constants and configuration
 export { xmlTypes } from './xmlTypes';
+export { 
+  setXmlTypes, 
+  addXmlType, 
+  removeXmlType, 
+  updateXmlType, 
+  getXmlTypes 
+} from './xmlTypes';
 export type { XmlTypesArray, XmlType } from './xmlTypes'; 

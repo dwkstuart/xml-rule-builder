@@ -8,7 +8,7 @@ A TypeScript library for building and managing XML-based rule systems, with opti
 - **React Components** for easy UI integration
 - **Validation** with detailed error reporting
 - **Type Safety** with full TypeScript support
-- **Read-only Rule Types** - users cannot modify predefined rule types
+- **Configurable Rule Types** - users can define and modify rule types
 - **Flexible Rule Structure** supporting nested groups with AND/OR logic
 
 ## Installation
@@ -45,6 +45,71 @@ if (!validation.isValid) {
 
 // Create default rule structure
 const defaultRules = createDefaultGroup();
+```
+
+### Configuring Rule Types
+
+The library comes with default rule types, but you can configure them to match your needs:
+
+```typescript
+import { 
+  setXmlTypes, 
+  addXmlType, 
+  removeXmlType, 
+  updateXmlType, 
+  getXmlTypes,
+  type XmlRuleType 
+} from 'xml-rules-builder';
+
+// Replace all rule types
+const customTypes: XmlRuleType[] = [
+  {
+    label: 'Score',
+    value: 'score',
+    comparators: [
+      { label: 'Greater Than', value: 'greater_than' },
+      { label: 'Less Than', value: 'less_than' },
+      { label: 'Equals', value: 'equals' }
+    ]
+  },
+  {
+    label: 'Category',
+    value: 'category',
+    comparators: [
+      { label: 'Equals', value: 'equals' },
+      { label: 'Not Equals', value: 'not_equals' }
+    ]
+  }
+];
+
+setXmlTypes(customTypes);
+
+// Add a new rule type
+addXmlType({
+  label: 'Priority',
+  value: 'priority',
+  comparators: [
+    { label: 'High', value: 'high' },
+    { label: 'Medium', value: 'medium' },
+    { label: 'Low', value: 'low' }
+  ]
+});
+
+// Remove a rule type
+removeXmlType('age');
+
+// Update an existing rule type
+updateXmlType('score', {
+  label: 'Test Score',
+  value: 'score',
+  comparators: [
+    { label: 'Pass', value: 'pass' },
+    { label: 'Fail', value: 'fail' }
+  ]
+});
+
+// Get current rule types
+const currentTypes = getXmlTypes();
 ```
 
 ### React Components
@@ -95,6 +160,23 @@ Create a default rule with the first available rule type.
 
 #### `createDefaultGroup(): RuleBlock`
 Create a default group containing one default rule.
+
+### Rule Type Configuration
+
+#### `setXmlTypes(types: XmlRuleType[]): void`
+Replace all rule types with the provided array.
+
+#### `addXmlType(type: XmlRuleType): void`
+Add a new rule type to the existing list.
+
+#### `removeXmlType(value: string): void`
+Remove a rule type by its value.
+
+#### `updateXmlType(value: string, updatedType: XmlRuleType): void`
+Update an existing rule type.
+
+#### `getXmlTypes(): XmlRuleType[]`
+Get a copy of the current rule types array.
 
 ### Block Operations
 
@@ -172,9 +254,9 @@ A React component for building XML rules with a visual interface.
 - `initialRules?: RuleBlock | null` - Initial rule structure
 - `onValidationChange?: (isValid: boolean, errors: string[]) => void` - Callback when validation changes
 
-## Predefined Rule Types
+## Default Rule Types
 
-The library includes predefined rule types that cannot be modified by users:
+The library includes these default rule types that can be modified:
 
 - **Age**: Equals, Less Than, Greater Than, Between
 - **Date of Birth**: Before, After, On, Between
