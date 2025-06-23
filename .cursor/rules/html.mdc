@@ -1,0 +1,6 @@
+---
+description: 
+globs: .html,.css
+alwaysApply: false
+---
+create separate stylesheets rather than inline

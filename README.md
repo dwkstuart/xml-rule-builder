@@ -649,3 +649,30 @@ See [CHANGELOG.md](./CHANGELOG.md) for a list of changes and version history.
 ## License
 
 GPL-3.0
+
+## Mini App Demo (UMD Bundle)
+
+You can try the real XML Rule Builder UI in a browser using the mini app demo:
+
+1. **Build the library as a UMD bundle** (so it exposes `window.XmlRuleBuilder`):
+   
+   ```bash
+   npm run build
+   # or if you use a custom script for UMD:
+   npm run build:umd
+   ```
+   This will output a UMD bundle in the `dist/` directory (e.g. `dist/xml-rule-builder.umd.js`).
+
+2. **Serve the project locally** (do not use `file://`):
+   
+   ```bash
+   npx serve .
+   # or
+   npx http-server .
+   ```
+
+3. **Open the mini app**:
+   
+   Go to [http://localhost:5000/examples/mini-app.html](http://localhost:5000/examples/mini-app.html) (or the port your server uses).
+
+The mini app will use the actual built library and always reflect the latest features and input field types.

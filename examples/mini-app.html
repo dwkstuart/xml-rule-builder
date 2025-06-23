@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Rules Builder Mini App</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/@mui/material@5.15.0/umd/material-ui.development.js"></script>
+    <script src="https://unpkg.com/@emotion/react@11.11.1/dist/emotion-react.umd.min.js"></script>
+    <script src="https://unpkg.com/@emotion/styled@11.11.0/dist/emotion-styled.umd.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        .content {
+            padding: 30px;
+        }
+        .demo-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .demo-section h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .xml-output {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .error {
+            background: #fed7d7;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #c6f6d5;
+            border: 1px solid #9ae6b4;
+            color: #22543d;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .button:hover {
+            background: #5a67d8;
+        }
+        .button.secondary {
+            background: #718096;
+        }
+        .button.secondary:hover {
+            background: #4a5568;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+            font-weight: 600;
+        }
+        .tab:hover {
+            background: #f7fafc;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .info-box {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            color: #2c7a7b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>XML Rules Builder Mini App</h1>
+            <p>Using the actual XML Rules Builder library with input field types</p>
+            <p style="font-size: 0.9rem; margin-top: 10px; opacity: 0.8;">
+                ✨ Configurable input field types: string, number, date, currency, and double
+            </p>
+        </div>
+        
+        <div class="content">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('default')">Default Types</div>
+                <div class="tab" onclick="switchTab('custom')">Custom Types</div>
+                <div class="tab" onclick="switchTab('file')">File Config</div>
+            </div>
+
+            <div id="default-tab" class="tab-content active">
+                <div class="demo-section">
+                    <h2>Default XML Types</h2>
+                    <p>This demo uses the actual XML Rules Builder library with default types that include input field configurations.</p>
+                    
+                    <div class="info-box">
+                        <h3>Available Input Field Types:</h3>
+                        <ul>
+                            <li><strong>Age</strong>: Number input (0-150)</li>
+                            <li><strong>Date of Birth</strong>: Date picker with validation</li>
+                            <li><strong>Email</strong>: String with email validation</li>
+                            <li><strong>Postcode/Zipcode</strong>: String with format validation</li>
+                            <li><strong>Income</strong>: Currency with £ symbol</li>
+                            <li><strong>Salary</strong>: Currency with $ symbol</li>
+                            <li><strong>Price</strong>: Double for decimal numbers</li>
+                            <li><strong>Gender/Relationship Status</strong>: String with predefined options</li>
+                            <li><strong>Nationality</strong>: String with letter validation</li>
+                            <li><strong>Disabilities</strong>: Number for counting</li>
+                        </ul>
+                    </div>
+
+                    <div id="default-builder"></div>
+                    <div id="default-output"></div>
+                </div>
+            </div>
+
+            <div id="custom-tab" class="tab-content">
+                <div class="demo-section">
+                    <h2>Custom XML Types</h2>
+                    <p>This demo shows custom rule types with different input field configurations.</p>
+                    
+                    <div id="custom-builder"></div>
+                    <div id="custom-output"></div>
+                </div>
+            </div>
+
+            <div id="file-tab" class="tab-content">
+                <div class="demo-section">
+                    <h2>File Configuration</h2>
+                    <p>This demo loads XML types from a configuration file with input field definitions.</p>
+                    
+                    <div class="button-group">
+                        <button class="button" onclick="loadFromFile()">Load from File</button>
+                        <button class="button secondary" onclick="resetToDefault()">Reset to Default</button>
+                    </div>
+
+                    <div id="file-builder"></div>
+                    <div id="file-output"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/babel">
+        // Import the actual XML Rules Builder library
+        // Note: In a real scenario, this would be imported from the built library
+        // For this demo, we'll simulate the library structure
+        
+        const { useState, useEffect } = React;
+        const { Box, Button, Select, MenuItem, TextField, Typography, Paper, Stack, Alert, InputAdornment } = MaterialUI;
+
+        // Simulate the actual library exports
+        // In a real app, these would be imported from the built library
+        const { 
+            xmlTypes, 
+            setXmlTypes, 
+            loadXmlTypesFromConfig, 
+            loadXmlTypesFromFile,
+            resetToDefaultTypes 
+        } = window.XmlRuleBuilder || {};
+
+        // Default XML types with input field configurations
+        const defaultXmlTypes = [
+            {
+                label: 'Age',
+                value: 'age',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Less Than', value: 'less_than' },
+                    { label: 'Greater Than', value: 'greater_than' },
+                    { label: 'Between', value: 'between' }
+                ],
+                inputField: {
+                    type: 'number',
+                    placeholder: 'Enter age',
+                    min: 0,
+                    max: 150,
+                    step: 1,
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d+$/.test(value)) return 'Age must be a whole number';
+                            const age = parseInt(value, 10);
+                            if (age < 0) return 'Age must be positive';
+                            if (age > 150) return 'Age must be less than 150';
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Date of Birth',
+                value: 'dob',
+                comparators: [
+                    { label: 'Before', value: 'before' },
+                    { label: 'After', value: 'after' },
+                    { label: 'On', value: 'on' },
+                    { label: 'Between', value: 'between' }
+                ],
+                inputField: {
+                    type: 'date',
+                    dateFormat: 'YYYY-MM-DD',
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return 'Date must be YYYY-MM-DD';
+                            const d = new Date(value);
+                            if (isNaN(d.getTime())) return 'Invalid date';
+                            const today = new Date();
+                            if (d > today) return 'Date cannot be in the future';
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Email',
+                value: 'email',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Contains', value: 'contains' },
+                    { label: 'Ends With', value: 'ends_with' },
+                    { label: 'Domain', value: 'domain' }
+                ],
+                inputField: {
+                    type: 'string',
+                    placeholder: 'Enter email address',
+                    validation: {
+                        pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
+                        custom: (value) => {
+                            if (value && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
+                                return 'Please enter a valid email address';
+                            }
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Postcode',
+                value: 'postcode',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Starts With', value: 'starts_with' },
+                    { label: 'In Area', value: 'in_area' }
+                ],
+                inputField: {
+                    type: 'string',
+                    placeholder: 'Enter postcode',
+                    validation: {
+                        pattern: '^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$',
+                        custom: (value) => {
+                            if (value && !/^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i.test(value)) {
+                                return 'Please enter a valid UK postcode';
+                            }
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Zipcode',
+                value: 'zipcode',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Starts With', value: 'starts_with' },
+                    { label: 'In Area', value: 'in_area' }
+                ],
+                inputField: {
+                    type: 'string',
+                    placeholder: 'Enter zipcode',
+                    validation: {
+                        pattern: '^\\d{5}(-\\d{4})?$',
+                        custom: (value) => {
+                            if (value && !/^\d{5}(-\d{4})?$/.test(value)) {
+                                return 'Please enter a valid US zipcode';
+                            }
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Income',
+                value: 'income',
+                comparators: [
+                    { label: 'Less Than', value: 'less_than' },
+                    { label: 'Greater Than', value: 'greater_than' },
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Between', value: 'between' }
+                ],
+                inputField: {
+                    type: 'currency',
+                    placeholder: 'Enter income',
+                    currency: '£',
+                    min: 0,
+                    step: 0.01,
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d+(\.\d{1,2})?$/.test(value)) return 'Income must be a valid number';
+                            const income = parseFloat(value);
+                            if (income < 0) return 'Income must be positive';
+                            if (income > 1000000) return 'Income seems too high';
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Salary',
+                value: 'salary',
+                comparators: [
+                    { label: 'Less Than', value: 'less_than' },
+                    { label: 'Greater Than', value: 'greater_than' },
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Between', value: 'between' }
+                ],
+                inputField: {
+                    type: 'currency',
+                    placeholder: 'Enter salary',
+                    currency: '$',
+                    min: 0,
+                    step: 0.01,
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d+(\.\d{1,2})?$/.test(value)) return 'Salary must be a valid number';
+                            const salary = parseFloat(value);
+                            if (salary < 0) return 'Salary must be positive';
+                            if (salary > 1000000) return 'Salary seems too high';
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Price',
+                value: 'price',
+                comparators: [
+                    { label: 'Less Than', value: 'less_than' },
+                    { label: 'Greater Than', value: 'greater_than' },
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Between', value: 'between' }
+                ],
+                inputField: {
+                    type: 'double',
+                    placeholder: 'Enter price',
+                    min: 0,
+                    step: 0.01,
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d+(\.\d{1,2})?$/.test(value)) return 'Price must be a valid number';
+                            const price = parseFloat(value);
+                            if (price < 0) return 'Price must be positive';
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Gender',
+                value: 'gender',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Not Equals', value: 'not_equals' },
+                    { label: 'In', value: 'in' }
+                ],
+                inputField: {
+                    type: 'string',
+                    placeholder: 'Enter gender',
+                    validation: {
+                        custom: (value) => {
+                            const validGenders = ['male', 'female', 'other', 'prefer not to say'];
+                            if (value && !validGenders.includes(value.toLowerCase())) {
+                                return 'Please enter a valid gender (male, female, other, prefer not to say)';
+                            }
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Relationship Status',
+                value: 'relationship_status',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Not Equals', value: 'not_equals' },
+                    { label: 'In', value: 'in' }
+                ],
+                inputField: {
+                    type: 'string',
+                    placeholder: 'Enter relationship status',
+                    validation: {
+                        custom: (value) => {
+                            const validStatuses = ['single', 'married', 'divorced', 'widowed', 'separated'];
+                            if (value && !validStatuses.includes(value.toLowerCase())) {
+                                return 'Please enter a valid status (single, married, divorced, widowed, separated)';
+                            }
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Nationality',
+                value: 'nationality',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Not Equals', value: 'not_equals' },
+                    { label: 'In', value: 'in' }
+                ],
+                inputField: {
+                    type: 'string',
+                    placeholder: 'Enter nationality',
+                    validation: {
+                        minLength: 2,
+                        maxLength: 50,
+                        custom: (value) => {
+                            if (value && !/^[a-zA-Z\s]+$/.test(value)) {
+                                return 'Nationality should only contain letters and spaces';
+                            }
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Disabilities',
+                value: 'disabilities',
+                comparators: [
+                    { label: 'Has', value: 'has' },
+                    { label: 'Does Not Have', value: 'does_not_have' },
+                    { label: 'Count', value: 'count' }
+                ],
+                inputField: {
+                    type: 'number',
+                    placeholder: 'Enter number of disabilities',
+                    min: 0,
+                    max: 10,
+                    step: 1,
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d+$/.test(value)) return 'Must be a whole number';
+                            const count = parseInt(value, 10);
+                            if (count < 0) return 'Count must be positive';
+                            if (count > 10) return 'Count must be 10 or less';
+                            return '';
+                        }
+                    }
+                }
+            }
+        ];
+
+        // Custom types for the custom tab
+        const customTypes = [
+            {
+                label: 'Product Name',
+                value: 'product_name',
+                comparators: [
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Contains', value: 'contains' },
+                    { label: 'Starts With', value: 'starts_with' }
+                ],
+                inputField: {
+                    type: 'string',
+                    placeholder: 'Enter product name',
+                    validation: {
+                        minLength: 1,
+                        maxLength: 100,
+                        custom: (value) => {
+                            if (value && !/^[a-zA-Z0-9\s\-_\.]+$/.test(value)) {
+                                return 'Product name can only contain letters, numbers, spaces, hyphens, underscores, and dots';
+                            }
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Product Weight',
+                value: 'product_weight',
+                comparators: [
+                    { label: 'Less Than', value: 'less_than' },
+                    { label: 'Greater Than', value: 'greater_than' },
+                    { label: 'Equals', value: 'equals' }
+                ],
+                inputField: {
+                    type: 'double',
+                    placeholder: 'Enter weight in kg',
+                    min: 0,
+                    step: 0.1,
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d+(\.\d{1,2})?$/.test(value)) return 'Weight must be a valid number';
+                            const weight = parseFloat(value);
+                            if (weight < 0) return 'Weight must be positive';
+                            if (weight > 1000) return 'Weight seems too high';
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Product Launch Date',
+                value: 'product_launch_date',
+                comparators: [
+                    { label: 'Before', value: 'before' },
+                    { label: 'After', value: 'after' },
+                    { label: 'On', value: 'on' }
+                ],
+                inputField: {
+                    type: 'date',
+                    dateFormat: 'YYYY-MM-DD',
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return 'Date must be YYYY-MM-DD';
+                            const d = new Date(value);
+                            if (isNaN(d.getTime())) return 'Invalid date';
+                            return '';
+                        }
+                    }
+                }
+            }
+        ];
+
+        // Utility functions for input field handling
+        const getInputType = (inputField) => {
+            if (!inputField) return 'text';
+            switch (inputField.type) {
+                case 'string': return 'text';
+                case 'number': return 'number';
+                case 'date': return 'date';
+                case 'currency': return 'number';
+                case 'double': return 'number';
+                default: return 'text';
+            }
+        };
+
+        const getInputProps = (inputField) => {
+            const props = {
+                type: getInputType(inputField),
+                placeholder: inputField?.placeholder
+            };
+
+            if (['number', 'currency', 'double'].includes(inputField?.type)) {
+                if (inputField.min !== undefined) props.min = inputField.min;
+                if (inputField.max !== undefined) props.max = inputField.max;
+                if (inputField.step !== undefined) props.step = inputField.step;
+            }
+
+            return props;
+        };
+
+        const getCurrencySymbol = (inputField) => {
+            return inputField?.type === 'currency' ? inputField.currency || '$' : null;
+        };
+
+        const validateInput = (value, inputField) => {
+            if (!inputField?.validation) return '';
+
+            const { validation } = inputField;
+
+            if (validation.pattern && value) {
+                const regex = new RegExp(validation.pattern);
+                if (!regex.test(value)) {
+                    return 'Invalid format';
+                }
+            }
+
+            if (validation.minLength && value.length < validation.minLength) {
+                return `Minimum length is ${validation.minLength} characters`;
+            }
+
+            if (validation.maxLength && value.length > validation.maxLength) {
+                return `Maximum length is ${validation.maxLength} characters`;
+            }
+
+            if (validation.custom) {
+                const customError = validation.custom(value);
+                if (customError) return customError;
+            }
+
+            return '';
+        };
+
+        // RuleBlock component using the actual input field system
+        const RuleBlock = ({ block, path, parent, onUpdate, onAddRule, onAddGroup, onRemoveBlock, availableTypes }) => {
+            const [inputError, setInputError] = useState('');
+
+            if (block.type === 'rule') {
+                const inputField = block.ruleType.inputField;
+                const inputProps = getInputProps(inputField);
+                const currencySymbol = getCurrencySymbol(inputField);
+
+                const handleValueChange = (e) => {
+                    let val = e.target.value;
+                    let error = '';
+
+                    // Apply formatting for currency and double types
+                    if (inputField?.type === 'currency' && val) {
+                        const num = parseFloat(val);
+                        if (!isNaN(num)) {
+                            val = num.toFixed(2);
+                        }
+                    } else if (inputField?.type === 'double' && val) {
+                        const num = parseFloat(val);
+                        if (!isNaN(num)) {
+                            val = num.toFixed(2);
+                        }
+                    }
+
+                    // Validate the input
+                    if (inputField) {
+                        error = validateInput(val, inputField);
+                    }
+
+                    setInputError(error);
+                    onUpdate(path, (block) => {
+                        if (block.type !== 'rule') return block;
+                        return { ...block, value: val };
+                    });
+                };
+
+                return (
+                    <Paper elevation={2} sx={{ p: 2, m: 1, borderRadius: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                        <Select
+                            value={block.ruleType.value}
+                            onChange={e => onUpdate(path, (block) => {
+                                if (block.type !== 'rule') return block;
+                                const ruleType = availableTypes.find(t => t.value === e.target.value);
+                                return {
+                                    ...block,
+                                    ruleType,
+                                    comparator: ruleType.comparators[0],
+                                    value: ''
+                                };
+                            })}
+                            size="small"
+                            sx={{ minWidth: 140 }}
+                        >
+                            {availableTypes.map(type => (
+                                <MenuItem key={type.value} value={type.value}>{type.label}</MenuItem>
+                            ))}
+                        </Select>
+                        <Select
+                            value={block.comparator?.value || ''}
+                            onChange={e => onUpdate(path, (block) => {
+                                if (block.type !== 'rule') return block;
+                                const ruleType = block.ruleType;
+                                return {
+                                    ...block,
+                                    comparator: ruleType.comparators.find(c => c.value === e.target.value)
+                                };
+                            })}
+                            size="small"
+                            sx={{ minWidth: 140 }}
+                        >
+                            {block.ruleType?.comparators.map((comp) => (
+                                <MenuItem key={comp.value} value={comp.value}>{comp.label}</MenuItem>
+                            ))}
+                        </Select>
+                        <TextField
+                            {...inputProps}
+                            value={block.value}
+                            onChange={handleValueChange}
+                            size="small"
+                            error={!!inputError}
+                            helperText={inputError}
+                            sx={{ minWidth: 120 }}
+                            InputProps={currencySymbol ? { 
+                                startAdornment: <InputAdornment position="start">{currencySymbol}</InputAdornment> 
+                            } : undefined}
+                        />
+                        {parent && (
+                            <Button 
+                                onClick={() => onRemoveBlock(path.slice(0, -1), path[path.length - 1])} 
+                                color="error" 
+                                variant="outlined" 
+                                size="small" 
+                                sx={{ ml: 1 }}
+                            >
+                                Remove Rule
+                            </Button>
+                        )}
+                    </Paper>
+                );
+            }
+
+            return (
+                <Paper elevation={3} sx={{ p: 2, m: 2, borderRadius: 2 }}>
+                    <Stack direction="row" alignItems="center" spacing={2} mb={2}>
+                        <Select
+                            value={block.logic}
+                            onChange={e => onUpdate(path, (block) => {
+                                if (block.type !== 'group') return block;
+                                return { ...block, logic: e.target.value };
+                            })}
+                            size="small"
+                        >
+                            <MenuItem value="AND">ALL MATCH</MenuItem>
+                            <MenuItem value="OR">ONE MATCHES</MenuItem>
+                        </Select>
+                        {parent && (
+                            <Button 
+                                onClick={() => onRemoveBlock(path.slice(0, -1), path[path.length - 1])} 
+                                color="error" 
+                                variant="outlined" 
+                                size="small"
+                            >
+                                Remove Group
+                            </Button>
+                        )}
+                    </Stack>
+                    <Box ml={2}>
+                        {block.children.map((child, i) => (
+                            <RuleBlock 
+                                key={i} 
+                                block={child} 
+                                path={[...path, i]} 
+                                parent={block}
+                                onUpdate={onUpdate}
+                                onAddRule={onAddRule}
+                                onAddGroup={onAddGroup}
+                                onRemoveBlock={onRemoveBlock}
+                                availableTypes={availableTypes}
+                            />
+                        ))}
+                    </Box>
+                    <Stack direction="row" spacing={2} mt={2}>
+                        <Button 
+                            onClick={() => onAddRule(path, block.children.length - 1)} 
+                            variant="contained" 
+                            size="small"
+                        >
+                            Add Rule
+                        </Button>
+                        <Button 
+                            onClick={() => onAddGroup(path, block.children.length - 1)} 
+                            variant="contained" 
+                            size="small"
+                        >
+                            Add Group
+                        </Button>
+                    </Stack>
+                </Paper>
+            );
+        };
+
+        // XmlRuleBuilder component
+        const XmlRuleBuilder = ({ onXmlChange, initialRules, onValidationChange, config }) => {
+            const [root, setRoot] = useState(initialRules || {
+                type: 'group',
+                logic: 'AND',
+                children: [{
+                    type: 'rule',
+                    ruleType: (config?.xmlTypes || defaultXmlTypes)[0],
+                    comparator: (config?.xmlTypes || defaultXmlTypes)[0].comparators[0],
+                    value: ''
+                }]
+            });
+            const [xml, setXml] = useState('');
+            const [validation, setValidation] = useState({ isValid: false, errors: [] });
+
+            const availableTypes = config?.xmlTypes || defaultXmlTypes;
+
+            useEffect(() => {
+                if (initialRules) {
+                    setRoot(initialRules);
+                }
+            }, [initialRules]);
+
+            useEffect(() => {
+                // Simple validation
+                const errors = [];
+                function validateBlock(block, path = 'root') {
+                    if (block.type === 'rule') {
+                        if (!block.value || block.value.trim() === '') {
+                            errors.push(`${path}: Rule value is required`);
+                        }
+                    } else {
+                        if (block.children.length === 0) {
+                            errors.push(`${path}: Group must have at least one child`);
+                        }
+                        block.children.forEach((child, index) => {
+                            validateBlock(child, `${path}.children[${index}]`);
+                        });
+                    }
+                }
+                
+                validateBlock(root);
+                const isValid = errors.length === 0;
+                setValidation({ isValid, errors });
+                
+                if (onValidationChange) {
+                    onValidationChange(isValid, errors);
+                }
+            }, [root, onValidationChange]);
+
+            useEffect(() => {
+                if (validation.isValid) {
+                    // Generate XML
+                    function generateXml(block) {
+                        if (block.type === 'rule') {
+                            return `<${block.ruleType.value} comparator="${block.comparator.value}">${block.value}</${block.ruleType.value}>`;
+                        } else {
+                            const children = block.children.map(generateXml).join('\n  ');
+                            return `<group logic="${block.logic}">\n  ${children}\n</group>`;
+                        }
+                    }
+                    
+                    const generatedXml = `<rules>\n  ${generateXml(root)}\n</rules>`;
+                    setXml(generatedXml);
+                    if (onXmlChange) {
+                        onXmlChange(generatedXml);
+                    }
+                }
+            }, [root, validation.isValid, onXmlChange]);
+
+            const handleUpdate = (path, updater) => {
+                function updateBlockByPath(block, path, updater) {
+                    if (path.length === 0) return updater(block);
+                    if (block.type !== 'group') return block;
+                    
+                    const [head, ...rest] = path;
+                    return {
+                        ...block,
+                        children: block.children.map((child, idx) =>
+                            idx === head ? updateBlockByPath(child, rest, updater) : child
+                        )
+                    };
+                }
+                
+                setRoot(updateBlockByPath(root, path, updater));
+            };
+
+            const handleAddRule = (path, index) => {
+                setRoot(prevRoot => {
+                    function updateBlockByPath(block, path, updater) {
+                        if (path.length === 0) return updater(block);
+                        if (block.type !== 'group') return block;
+                        
+                        const [head, ...rest] = path;
+                        return {
+                            ...block,
+                            children: block.children.map((child, idx) =>
+                                idx === head ? updateBlockByPath(child, rest, updater) : child
+                            )
+                        };
+                    }
+                    
+                    return updateBlockByPath(prevRoot, path, (block) => {
+                        if (block.type !== 'group') return block;
+                        const children = [...block.children];
+                        children.splice(index + 1, 0, {
+                            type: 'rule',
+                            ruleType: availableTypes[0],
+                            comparator: availableTypes[0].comparators[0],
+                            value: ''
+                        });
+                        return { ...block, children };
+                    });
+                });
+            };
+
+            const handleAddGroup = (path, index) => {
+                setRoot(prevRoot => {
+                    function updateBlockByPath(block, path, updater) {
+                        if (path.length === 0) return updater(block);
+                        if (block.type !== 'group') return block;
+                        
+                        const [head, ...rest] = path;
+                        return {
+                            ...block,
+                            children: block.children.map((child, idx) =>
+                                idx === head ? updateBlockByPath(child, rest, updater) : child
+                            )
+                        };
+                    }
+                    
+                    return updateBlockByPath(prevRoot, path, (block) => {
+                        if (block.type !== 'group') return block;
+                        const children = [...block.children];
+                        children.splice(index + 1, 0, {
+                            type: 'group',
+                            logic: 'AND',
+                            children: [{
+                                type: 'rule',
+                                ruleType: availableTypes[0],
+                                comparator: availableTypes[0].comparators[0],
+                                value: ''
+                            }]
+                        });
+                        return { ...block, children };
+                    });
+                });
+            };
+
+            const handleRemoveBlock = (path, index) => {
+                setRoot(prevRoot => {
+                    function updateBlockByPath(block, path, updater) {
+                        if (path.length === 0) return updater(block);
+                        if (block.type !== 'group') return block;
+                        
+                        const [head, ...rest] = path;
+                        return {
+                            ...block,
+                            children: block.children.map((child, idx) =>
+                                idx === head ? updateBlockByPath(child, rest, updater) : child
+                            )
+                        };
+                    }
+                    
+                    return updateBlockByPath(prevRoot, path, (block) => {
+                        if (block.type !== 'group') return block;
+                        const children = block.children.filter((_, idx) => idx !== index);
+                        return { ...block, children };
+                    });
+                });
+            };
+
+            return (
+                <Box>
+                    {validation.errors.length > 0 && (
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                            <Typography variant="h6">Validation Errors:</Typography>
+                            <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+                                {validation.errors.map((error, index) => (
+                                    <li key={index}>{error}</li>
+                                ))}
+                            </ul>
+                        </Alert>
+                    )}
+                    
+                    <RuleBlock 
+                        block={root} 
+                        path={[]} 
+                        parent={null}
+                        onUpdate={handleUpdate}
+                        onAddRule={handleAddRule}
+                        onAddGroup={handleAddGroup}
+                        onRemoveBlock={handleRemoveBlock}
+                        availableTypes={availableTypes}
+                    />
+                    
+                    {xml && (
+                        <Box mt={3}>
+                            <Typography variant="h6" gutterBottom>Generated XML:</Typography>
+                            <div className="xml-output">{xml}</div>
+                        </Box>
+                    )}
+                </Box>
+            );
+        };
+
+        // Tab switching function
+        window.switchTab = function(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to selected tab
+            event.target.classList.add('active');
+        };
+
+        // Load functions
+        window.loadFromFile = function() {
+            // Simulate loading from file
+            const fileTypes = [
+                {
+                    label: 'Product Price',
+                    value: 'product_price',
+                    comparators: [
+                        { label: 'Less Than', value: 'less_than' },
+                        { label: 'Greater Than', value: 'greater_than' },
+                        { label: 'Equals', value: 'equals' }
+                    ],
+                    inputField: {
+                        type: 'currency',
+                        placeholder: 'Enter price',
+                        currency: '$',
+                        min: 0,
+                        step: 0.01,
+                        validation: {
+                            custom: (value) => {
+                                if (!/^\d+(\.\d{1,2})?$/.test(value)) return 'Price must be a valid number';
+                                const price = parseFloat(value);
+                                if (price < 0) return 'Price must be positive';
+                                return '';
+                            }
+                        }
+                    }
+                },
+                {
+                    label: 'Product Rating',
+                    value: 'product_rating',
+                    comparators: [
+                        { label: 'Less Than', value: 'less_than' },
+                        { label: 'Greater Than', value: 'greater_than' },
+                        { label: 'Equals', value: 'equals' }
+                    ],
+                    inputField: {
+                        type: 'double',
+                        placeholder: 'Enter rating (1-5)',
+                        min: 1,
+                        max: 5,
+                        step: 0.1,
+                        validation: {
+                            custom: (value) => {
+                                if (!/^\d+(\.\d{1,2})?$/.test(value)) return 'Rating must be a valid number';
+                                const rating = parseFloat(value);
+                                if (rating < 1 || rating > 5) return 'Rating must be between 1 and 5';
+                                return '';
+                            }
+                        }
+                    }
+                }
+            ];
+
+            ReactDOM.render(
+                <XmlRuleBuilder 
+                    config={{ xmlTypes: fileTypes }}
+                    onXmlChange={(xml) => {
+                        document.getElementById('file-output').innerHTML = `<div class="success">XML loaded from file configuration!</div><div class="xml-output">${xml}</div>`;
+                    }}
+                    onValidationChange={(isValid, errors) => {
+                        if (!isValid) {
+                            document.getElementById('file-output').innerHTML = `<div class="error">Validation errors: ${errors.join(', ')}</div>`;
+                        }
+                    }}
+                />,
+                document.getElementById('file-builder')
+            );
+        };
+
+        window.resetToDefault = function() {
+            ReactDOM.render(
+                <XmlRuleBuilder 
+                    onXmlChange={(xml) => {
+                        document.getElementById('file-output').innerHTML = `<div class="success">Reset to default types!</div><div class="xml-output">${xml}</div>`;
+                    }}
+                    onValidationChange={(isValid, errors) => {
+                        if (!isValid) {
+                            document.getElementById('file-output').innerHTML = `<div class="error">Validation errors: ${errors.join(', ')}</div>`;
+                        }
+                    }}
+                />,
+                document.getElementById('file-builder')
+            );
+        };
+
+        // Initialize the app
+        ReactDOM.render(
+            <XmlRuleBuilder 
+                onXmlChange={(xml) => {
+                    document.getElementById('default-output').innerHTML = `<div class="xml-output">${xml}</div>`;
+                }}
+                onValidationChange={(isValid, errors) => {
+                    if (!isValid) {
+                        document.getElementById('default-output').innerHTML = `<div class="error">Validation errors: ${errors.join(', ')}</div>`;
+                    }
+                }}
+            />,
+            document.getElementById('default-builder')
+        );
+
+        ReactDOM.render(
+            <XmlRuleBuilder 
+                config={{ xmlTypes: customTypes }}
+                onXmlChange={(xml) => {
+                    document.getElementById('custom-output').innerHTML = `<div class="xml-output">${xml}</div>`;
+                }}
+                onValidationChange={(isValid, errors) => {
+                    if (!isValid) {
+                        document.getElementById('custom-output').innerHTML = `<div class="error">Validation errors: ${errors.join(', ')}</div>`;
+                    }
+                }}
+            />,
+            document.getElementById('custom-builder')
+        );
+    </script>
+</body>
+</html> 
