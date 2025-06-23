@@ -11,11 +11,35 @@ A TypeScript library for building and managing XML-based rule systems, with opti
 - **Configurable Rule Types** - define your own custom rule types
 - **Flexible Rule Structure** supporting nested groups with AND/OR logic
 
+## Prerequisites
+
+- Node.js >= 16.0.0
+- npm >= 8.0.0
+- React >= 18.0.0 (for React components)
+- Material-UI >= 7.0.0 (for React components)
+
 ## Installation
 
 ```bash
 npm install xml-rule-builder
 ```
+
+## Quick Start
+
+1. Install the package:
+   ```bash
+   npm install xml-rule-builder
+   ```
+
+2. Import and use:
+   ```typescript
+   import { XmlRuleBuilder } from 'xml-rule-builder';
+   ```
+
+3. Add to your React component:
+   ```typescript
+   <XmlRuleBuilder onXmlChange={(xml) => console.log(xml)} />
+   ```
 
 ## Usage
 
@@ -202,6 +226,17 @@ function MyComponent() {
 }
 ```
 
+## Examples
+
+### Basic Usage
+See [examples/basic-usage.ts](./examples/basic-usage.ts) for a simple implementation.
+
+### Custom Types
+See [examples/configurable-types-usage.ts](./examples/configurable-types-usage.ts) for custom type configuration.
+
+### Demo Page
+See [examples/demo-page.html](./examples/demo-page.html) for a complete interactive demo.
+
 ## API Reference
 
 ### Core Functions
@@ -365,6 +400,27 @@ The library includes default rule types that can be replaced or extended:
 </rules>
 ```
 
+## Troubleshooting
+
+### Common Issues
+
+**TypeScript errors with Material-UI components**
+- Ensure you have `@mui/material` installed as a peer dependency
+- Make sure you're using compatible versions of React and Material-UI
+
+**Build errors**
+- Run `npm run build:clean` to ensure a clean build
+- Check that all dependencies are properly installed
+
+**Validation errors**
+- Use the `onValidationChange` callback to get detailed error messages
+- Ensure your rule structure follows the expected format
+
+**ESLint configuration issues**
+- The project uses ESLint 9+ with flat config format
+- Ensure `eslint.config.mjs` is properly configured
+- Check that all required ESLint plugins are installed
+
 ## Development
 
 ### Building the Library
@@ -390,6 +446,41 @@ npm run lint
 ```bash
 npm test
 ```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+### Development Setup
+
+```bash
+git clone https://github.com/dwkstuart/xml-rule-builder.git
+cd xml-rule-builder
+npm install
+npm run dev
+```
+
+### Code Style
+
+- Follow TypeScript best practices
+- Avoid using `any` type (use proper type definitions)
+- Create small, reusable components where possible
+- Ensure properties are correctly passed between components
+- Write tests for new functionality
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md) for a list of changes and version history.
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/dwkstuart/xml-rule-builder/issues)
+- **Documentation**: [GitHub Wiki](https://github.com/dwkstuart/xml-rule-builder/wiki)
 
 ## License
 
