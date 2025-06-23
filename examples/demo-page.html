@@ -157,6 +157,9 @@
         <div class="header">
             <h1>XML Rules Builder</h1>
             <p>A TypeScript library for building and managing XML-based rule systems</p>
+            <p style="font-size: 0.9rem; margin-top: 10px; opacity: 0.8;">
+                ✨ Now with configurable input field types: string, number, date, currency, and double
+            </p>
         </div>
         
         <div class="content">
@@ -170,7 +173,7 @@
             <div id="default-tab" class="tab-content active">
                 <div class="demo-section">
                     <h2>Default XML Types Demo</h2>
-                    <p>This demo shows the XML Rules Builder with the default rule types (Age, Date of Birth, Email, Postcode, Zipcode, Income, Gender, Relationship Status, Nationality, Disabilities).</p>
+                    <p>This demo shows the XML Rules Builder with the default rule types including input field configurations. The types include: Age (number), Date of Birth (date), Email (string with validation), Postcode/Zipcode (string with format validation), Income/Salary (currency with symbols), Price (double), Gender/Relationship Status/Nationality (string with predefined options), and Disabilities (number).</p>
                     
                     <div class="button-group">
                         <button class="button" onclick="loadDefaultTypes()">Load Default Types</button>
@@ -307,7 +310,23 @@ const customTypes = [
                     { label: 'Less Than', value: 'less_than' },
                     { label: 'Greater Than', value: 'greater_than' },
                     { label: 'Between', value: 'between' }
-                ]
+                ],
+                inputField: {
+                    type: 'number',
+                    placeholder: 'Enter age',
+                    min: 0,
+                    max: 150,
+                    step: 1,
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d+$/.test(value)) return 'Age must be a whole number';
+                            const age = parseInt(value, 10);
+                            if (age < 0) return 'Age must be positive';
+                            if (age > 150) return 'Age must be less than 150';
+                            return '';
+                        }
+                    }
+                }
             },
             {
                 label: 'Date of Birth',
@@ -317,7 +336,21 @@ const customTypes = [
                     { label: 'After', value: 'after' },
                     { label: 'On', value: 'on' },
                     { label: 'Between', value: 'between' }
-                ]
+                ],
+                inputField: {
+                    type: 'date',
+                    dateFormat: 'YYYY-MM-DD',
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return 'Date must be YYYY-MM-DD';
+                            const d = new Date(value);
+                            if (isNaN(d.getTime())) return 'Invalid date';
+                            const today = new Date();
+                            if (d > today) return 'Date cannot be in the future';
+                            return '';
+                        }
+                    }
+                }
             },
             {
                 label: 'Email',
@@ -327,7 +360,20 @@ const customTypes = [
                     { label: 'Contains', value: 'contains' },
                     { label: 'Ends With', value: 'ends_with' },
                     { label: 'Domain', value: 'domain' }
-                ]
+                ],
+                inputField: {
+                    type: 'string',
+                    placeholder: 'Enter email address',
+                    validation: {
+                        pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
+                        custom: (value) => {
+                            if (value && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
+                                return 'Please enter a valid email address';
+                            }
+                            return '';
+                        }
+                    }
+                }
             },
             {
                 label: 'Postcode',
@@ -336,7 +382,20 @@ const customTypes = [
                     { label: 'Equals', value: 'equals' },
                     { label: 'Starts With', value: 'starts_with' },
                     { label: 'In Area', value: 'in_area' }
-                ]
+                ],
+                inputField: {
+                    type: 'string',
+                    placeholder: 'Enter postcode',
+                    validation: {
+                        pattern: '^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$',
+                        custom: (value) => {
+                            if (value && !/^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i.test(value)) {
+                                return 'Please enter a valid UK postcode';
+                            }
+                            return '';
+                        }
+                    }
+                }
             },
             {
                 label: 'Zipcode',
@@ -345,7 +404,20 @@ const customTypes = [
                     { label: 'Equals', value: 'equals' },
                     { label: 'Starts With', value: 'starts_with' },
                     { label: 'In Area', value: 'in_area' }
-                ]
+                ],
+                inputField: {
+                    type: 'string',
+                    placeholder: 'Enter zipcode',
+                    validation: {
+                        pattern: '^\\d{5}(-\\d{4})?$',
+                        custom: (value) => {
+                            if (value && !/^\d{5}(-\d{4})?$/.test(value)) {
+                                return 'Please enter a valid US zipcode';
+                            }
+                            return '';
+                        }
+                    }
+                }
             },
             {
                 label: 'Income',
@@ -355,7 +427,73 @@ const customTypes = [
                     { label: 'Greater Than', value: 'greater_than' },
                     { label: 'Equals', value: 'equals' },
                     { label: 'Between', value: 'between' }
-                ]
+                ],
+                inputField: {
+                    type: 'currency',
+                    placeholder: 'Enter income',
+                    currency: '£',
+                    min: 0,
+                    step: 0.01,
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d+(\.\d{1,2})?$/.test(value)) return 'Income must be a valid number';
+                            const income = parseFloat(value);
+                            if (income < 0) return 'Income must be positive';
+                            if (income > 1000000) return 'Income seems too high';
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Salary',
+                value: 'salary',
+                comparators: [
+                    { label: 'Less Than', value: 'less_than' },
+                    { label: 'Greater Than', value: 'greater_than' },
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Between', value: 'between' }
+                ],
+                inputField: {
+                    type: 'currency',
+                    placeholder: 'Enter salary',
+                    currency: '$',
+                    min: 0,
+                    step: 0.01,
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d+(\.\d{1,2})?$/.test(value)) return 'Salary must be a valid number';
+                            const salary = parseFloat(value);
+                            if (salary < 0) return 'Salary must be positive';
+                            if (salary > 1000000) return 'Salary seems too high';
+                            return '';
+                        }
+                    }
+                }
+            },
+            {
+                label: 'Price',
+                value: 'price',
+                comparators: [
+                    { label: 'Less Than', value: 'less_than' },
+                    { label: 'Greater Than', value: 'greater_than' },
+                    { label: 'Equals', value: 'equals' },
+                    { label: 'Between', value: 'between' }
+                ],
+                inputField: {
+                    type: 'double',
+                    placeholder: 'Enter price',
+                    min: 0,
+                    step: 0.01,
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d+(\.\d{1,2})?$/.test(value)) return 'Price must be a valid number';
+                            const price = parseFloat(value);
+                            if (price < 0) return 'Price must be positive';
+                            return '';
+                        }
+                    }
+                }
             },
             {
                 label: 'Gender',
@@ -364,7 +502,20 @@ const customTypes = [
                     { label: 'Equals', value: 'equals' },
                     { label: 'Not Equals', value: 'not_equals' },
                     { label: 'In', value: 'in' }
-                ]
+                ],
+                inputField: {
+                    type: 'string',
+                    placeholder: 'Enter gender',
+                    validation: {
+                        custom: (value) => {
+                            const validGenders = ['male', 'female', 'other', 'prefer not to say'];
+                            if (value && !validGenders.includes(value.toLowerCase())) {
+                                return 'Please enter a valid gender (male, female, other, prefer not to say)';
+                            }
+                            return '';
+                        }
+                    }
+                }
             },
             {
                 label: 'Relationship Status',
@@ -373,7 +524,20 @@ const customTypes = [
                     { label: 'Equals', value: 'equals' },
                     { label: 'Not Equals', value: 'not_equals' },
                     { label: 'In', value: 'in' }
-                ]
+                ],
+                inputField: {
+                    type: 'string',
+                    placeholder: 'Enter relationship status',
+                    validation: {
+                        custom: (value) => {
+                            const validStatuses = ['single', 'married', 'divorced', 'widowed', 'separated'];
+                            if (value && !validStatuses.includes(value.toLowerCase())) {
+                                return 'Please enter a valid status (single, married, divorced, widowed, separated)';
+                            }
+                            return '';
+                        }
+                    }
+                }
             },
             {
                 label: 'Nationality',
@@ -382,7 +546,21 @@ const customTypes = [
                     { label: 'Equals', value: 'equals' },
                     { label: 'Not Equals', value: 'not_equals' },
                     { label: 'In', value: 'in' }
-                ]
+                ],
+                inputField: {
+                    type: 'string',
+                    placeholder: 'Enter nationality',
+                    validation: {
+                        minLength: 2,
+                        maxLength: 50,
+                        custom: (value) => {
+                            if (value && !/^[a-zA-Z\s]+$/.test(value)) {
+                                return 'Nationality should only contain letters and spaces';
+                            }
+                            return '';
+                        }
+                    }
+                }
             },
             {
                 label: 'Disabilities',
@@ -391,7 +569,23 @@ const customTypes = [
                     { label: 'Has', value: 'has' },
                     { label: 'Does Not Have', value: 'does_not_have' },
                     { label: 'Count', value: 'count' }
-                ]
+                ],
+                inputField: {
+                    type: 'number',
+                    placeholder: 'Enter number of disabilities',
+                    min: 0,
+                    max: 10,
+                    step: 1,
+                    validation: {
+                        custom: (value) => {
+                            if (!/^\d+$/.test(value)) return 'Must be a whole number';
+                            const count = parseInt(value, 10);
+                            if (count < 0) return 'Count must be positive';
+                            if (count > 10) return 'Count must be 10 or less';
+                            return '';
+                        }
+                    }
+                }
             }
         ];
 
@@ -528,39 +722,96 @@ const customTypes = [
             const [inputError, setInputError] = useState('');
 
             if (block.type === 'rule') {
-                let inputType = 'text';
-                let adornment = null;
-                if (block.ruleType.value === 'age') inputType = 'number';
-                if (block.ruleType.value === 'dob') inputType = 'date';
-                if (block.ruleType.value === 'income') {
-                    inputType = 'number';
-                    adornment = '£';
-                }
-                if (block.ruleType.value === 'email') inputType = 'email';
-                if (block.ruleType.value === 'postcode' || block.ruleType.value === 'zipcode') inputType = 'text';
-                if (block.ruleType.value === 'disabilities') inputType = 'text';
+                const inputField = block.ruleType.inputField;
+                
+                // Get input type and props based on input field configuration
+                const getInputType = (inputField) => {
+                    if (!inputField) return 'text';
+                    switch (inputField.type) {
+                        case 'string': return 'text';
+                        case 'number': return 'number';
+                        case 'date': return 'date';
+                        case 'currency': return 'number';
+                        case 'double': return 'number';
+                        default: return 'text';
+                    }
+                };
+
+                const getInputProps = (inputField) => {
+                    const props = {
+                        type: getInputType(inputField),
+                        placeholder: inputField?.placeholder
+                    };
+
+                    if (['number', 'currency', 'double'].includes(inputField?.type)) {
+                        if (inputField.min !== undefined) props.min = inputField.min;
+                        if (inputField.max !== undefined) props.max = inputField.max;
+                        if (inputField.step !== undefined) props.step = inputField.step;
+                    }
+
+                    return props;
+                };
+
+                const getCurrencySymbol = (inputField) => {
+                    return inputField?.type === 'currency' ? inputField.currency || '$' : null;
+                };
+
+                const validateInput = (value, inputField) => {
+                    if (!inputField?.validation) return '';
+
+                    const { validation } = inputField;
+
+                    // Check pattern validation
+                    if (validation.pattern && value) {
+                        const regex = new RegExp(validation.pattern);
+                        if (!regex.test(value)) {
+                            return 'Invalid format';
+                        }
+                    }
+
+                    // Check length validation
+                    if (validation.minLength && value.length < validation.minLength) {
+                        return `Minimum length is ${validation.minLength} characters`;
+                    }
+
+                    if (validation.maxLength && value.length > validation.maxLength) {
+                        return `Maximum length is ${validation.maxLength} characters`;
+                    }
+
+                    // Check custom validation
+                    if (validation.custom) {
+                        const customError = validation.custom(value);
+                        if (customError) return customError;
+                    }
+
+                    return '';
+                };
+
+                const inputProps = getInputProps(inputField);
+                const currencySymbol = getCurrencySymbol(inputField);
 
                 const handleValueChange = (e) => {
-                    const val = e.target.value;
+                    let val = e.target.value;
                     let error = '';
-                    
-                    if (block.ruleType.value === 'age') {
-                        if (!/^\d+$/.test(val)) error = 'Age must be a whole number';
-                        if (parseInt(val, 10) < 0) error = 'Age must be positive';
+
+                    // Apply formatting for currency and double types
+                    if (inputField?.type === 'currency' && val) {
+                        const num = parseFloat(val);
+                        if (!isNaN(num)) {
+                            val = num.toFixed(2);
+                        }
+                    } else if (inputField?.type === 'double' && val) {
+                        const num = parseFloat(val);
+                        if (!isNaN(num)) {
+                            val = num.toFixed(2);
+                        }
                     }
-                    if (block.ruleType.value === 'dob') {
-                        if (!/^\d{4}-\d{2}-\d{2}$/.test(val)) error = 'Date must be YYYY-MM-DD';
+
+                    // Validate the input
+                    if (inputField) {
+                        error = validateInput(val, inputField);
                     }
-                    if (block.ruleType.value === 'income') {
-                        if (!/^\d+(\.\d{1,2})?$/.test(val)) error = 'Income must be a number';
-                    }
-                    if (block.ruleType.value === 'email') {
-                        if (val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) error = 'Please enter a valid email address';
-                    }
-                    if (block.ruleType.value === 'postcode' || block.ruleType.value === 'zipcode') {
-                        if (val && !/^[A-Z0-9\s-]+$/i.test(val)) error = 'Please enter a valid postal code';
-                    }
-                    
+
                     setInputError(error);
                     onUpdate(path, (block) => {
                         if (block.type !== 'rule') return block;
@@ -607,14 +858,14 @@ const customTypes = [
                             ))}
                         </Select>
                         <TextField
-                            type={inputType}
+                            {...inputProps}
                             value={block.value}
                             onChange={handleValueChange}
                             size="small"
                             error={!!inputError}
                             helperText={inputError}
                             sx={{ minWidth: 120 }}
-                            InputProps={adornment ? { startAdornment: adornment } : undefined}
+                            InputProps={currencySymbol ? { startAdornment: currencySymbol } : undefined}
                         />
                         {parent && (
                             <Button 
