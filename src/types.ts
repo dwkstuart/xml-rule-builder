@@ -1,7 +1,7 @@
 import { xmlTypes } from './xmlTypes';
 
 // Input field types
-export type InputFieldType = 'string' | 'number' | 'date' | 'currency' | 'double';
+export type InputFieldType = 'string' | 'number' | 'date' | 'currency' | 'double' | 'select';
 
 // Input field configuration
 export interface InputFieldConfig {
@@ -12,6 +12,7 @@ export interface InputFieldConfig {
   step?: number;
   currency?: string;
   dateFormat?: string;
+  options?: { label: string; value: string }[]; // For select type
   validation?: {
     pattern?: string;
     minLength?: number;

@@ -208,17 +208,14 @@ const defaultXmlTypes: XmlRuleType[] = [
       { label: 'In', value: 'in' }
     ],
     inputField: {
-      type: 'string',
-      placeholder: 'Enter gender',
-      validation: {
-        custom: (value: string) => {
-          const validGenders = ['male', 'female', 'other', 'prefer not to say'];
-          if (value && !validGenders.includes(value.toLowerCase())) {
-            return 'Please enter a valid gender (male, female, other, prefer not to say)';
-          }
-          return '';
-        }
-      }
+      type: 'select',
+      placeholder: 'Select gender',
+      options: [
+        { label: 'Male', value: 'male' },
+        { label: 'Female', value: 'female' },
+        { label: 'Other', value: 'other' },
+        { label: 'Prefer not to say', value: 'prefer_not_to_say' }
+      ]
     }
   },
   {
@@ -230,17 +227,15 @@ const defaultXmlTypes: XmlRuleType[] = [
       { label: 'In', value: 'in' }
     ],
     inputField: {
-      type: 'string',
-      placeholder: 'Enter relationship status',
-      validation: {
-        custom: (value: string) => {
-          const validStatuses = ['single', 'married', 'divorced', 'widowed', 'separated'];
-          if (value && !validStatuses.includes(value.toLowerCase())) {
-            return 'Please enter a valid status (single, married, divorced, widowed, separated)';
-          }
-          return '';
-        }
-      }
+      type: 'select',
+      placeholder: 'Select status',
+      options: [
+        { label: 'Single', value: 'single' },
+        { label: 'Married', value: 'married' },
+        { label: 'Divorced', value: 'divorced' },
+        { label: 'Widowed', value: 'widowed' },
+        { label: 'Separated', value: 'separated' }
+      ]
     }
   },
   {

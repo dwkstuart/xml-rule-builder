@@ -9,7 +9,7 @@ import { getInputProps, validateInput, getCurrencySymbol } from '../utils/inputF
 // Material UI imports
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Select from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -71,6 +71,15 @@ const GroupBlock: React.FC<{
       });
     };
 
+    const handleSelectChange = (e: SelectChangeEvent<string>) => {
+      const val = e.target.value;
+      setInputError(''); // Typically no validation needed on select change itself
+      onUpdate(path, (block) => {
+        if (block.type !== 'rule') return block;
+        return { ...block, value: val };
+      });
+    };
+
     return (
       <Paper elevation={2} sx={{ p: 2, m: 1, borderRadius: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
         <Select
@@ -111,18 +120,35 @@ const GroupBlock: React.FC<{
               ))
             : null}
         </Select>
-        <TextField
-          {...inputProps}
-          value={block.value}
-          onChange={handleValueChange}
-          size="small"
-          error={!!inputError}
-          helperText={inputError}
-          sx={{ minWidth: 120 }}
-          InputProps={currencySymbol ? { 
-            startAdornment: <InputAdornment position="start">{currencySymbol}</InputAdornment> 
-          } : undefined}
-        />
+        {inputField?.type === 'select' ? (
+          <Select
+            value={block.value}
+            onChange={handleSelectChange}
+            size="small"
+            displayEmpty
+            sx={{ minWidth: 120 }}
+          >
+            <MenuItem value="" disabled>
+              <em>{inputField.placeholder || 'Select...'}</em>
+            </MenuItem>
+            {inputField.options?.map(option => (
+              <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+            ))}
+          </Select>
+        ) : (
+          <TextField
+            {...inputProps}
+            value={block.value}
+            onChange={handleValueChange}
+            size="small"
+            error={!!inputError}
+            helperText={inputError}
+            sx={{ minWidth: 120 }}
+            InputProps={currencySymbol ? { 
+              startAdornment: <InputAdornment position="start">{currencySymbol}</InputAdornment> 
+            } : undefined}
+          />
+        )}
         {parent && (
           <Button 
             onClick={() => onRemoveBlock(path.slice(0, -1), path[path.length - 1])} 
