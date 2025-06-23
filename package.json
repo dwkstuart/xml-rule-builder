@@ -1,6 +1,6 @@
 {
     "name": "xml-rule-builder",
-    "version": "0.1.1-alpha.0",
+    "version": "0.1.1-alpha.2",
     "description": "A TypeScript library for building and managing XML-based rule systems with React components",
     "main": "dist/index.js",
     "module": "dist/index.js",
