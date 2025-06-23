@@ -5,6 +5,7 @@ import { createDefaultGroup } from '../utils/ruleBuilder';
 import { addRuleToGroup, addGroupToGroup, removeBlockFromGroup, updateBlockByPath } from '../utils/blockOperations';
 import { validateRuleBlock } from '../utils/validation';
 import { rulesToXml } from '../utils/rulesToXml';
+import { getInputProps, validateInput, getCurrencySymbol } from '../utils/inputFieldUtils';
 // Material UI imports
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -37,40 +38,32 @@ const GroupBlock: React.FC<{
   const [inputError, setInputError] = React.useState<string>('');
 
   if (block.type === 'rule') {
-    let inputType = 'text';
-    let adornment: string | null = null;
-    if (block.ruleType.value === 'age') inputType = 'number';
-    if (block.ruleType.value === 'dob') inputType = 'date';
-    if (block.ruleType.value === 'income') {
-      inputType = 'number';
-      adornment = '£';
-    }
-
-    const validate = (val: string): string => {
-      if (block.ruleType.value === 'age') {
-        if (!/^\d+$/.test(val)) return 'Age must be a whole number';
-        if (parseInt(val, 10) < 0) return 'Age must be positive';
-      }
-      if (block.ruleType.value === 'dob') {
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(val)) return 'Date must be YYYY-MM-DD';
-        const d = new Date(val);
-        if (isNaN(d.getTime())) return 'Invalid date';
-      }
-      if (block.ruleType.value === 'income') {
-        if (!/^\d+(\.\d{1,2})?$/.test(val)) return 'Income must be a number';
-        if (parseFloat(val) < 0) return 'Income must be positive';
-      }
-      return '';
-    };
+    const inputField = block.ruleType.inputField;
+    const inputProps = inputField ? getInputProps(inputField) : { type: 'text' };
+    const currencySymbol = inputField ? getCurrencySymbol(inputField) : null;
 
     const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       let val = e.target.value;
       let error = '';
-      if (block.ruleType.value === 'income' && val) {
-        const num = Math.round(Number(val));
-        val = isNaN(num) ? val : String(num);
+
+      // Apply formatting for currency and double types
+      if (inputField?.type === 'currency' && val) {
+        const num = parseFloat(val);
+        if (!isNaN(num)) {
+          val = num.toFixed(2);
+        }
+      } else if (inputField?.type === 'double' && val) {
+        const num = parseFloat(val);
+        if (!isNaN(num)) {
+          val = num.toFixed(2);
+        }
       }
-      error = validate(val);
+
+      // Validate the input
+      if (inputField) {
+        error = validateInput(val, inputField);
+      }
+
       setInputError(error);
       onUpdate(path, (block) => {
         if (block.type !== 'rule') return block;
@@ -119,14 +112,16 @@ const GroupBlock: React.FC<{
             : null}
         </Select>
         <TextField
-          type={inputType}
+          {...inputProps}
           value={block.value}
           onChange={handleValueChange}
           size="small"
           error={!!inputError}
           helperText={inputError}
           sx={{ minWidth: 120 }}
-          InputProps={adornment ? { startAdornment: <InputAdornment position="start">{adornment}</InputAdornment> } : undefined}
+          InputProps={currencySymbol ? { 
+            startAdornment: <InputAdornment position="start">{currencySymbol}</InputAdornment> 
+          } : undefined}
         />
         {parent && (
           <Button 

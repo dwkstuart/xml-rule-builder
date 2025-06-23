@@ -1,0 +1,135 @@
+{
+  "ruleTypes": [
+    {
+      "label": "Product Name",
+      "value": "product_name",
+      "comparators": [
+        { "label": "Equals", "value": "equals" },
+        { "label": "Contains", "value": "contains" },
+        { "label": "Starts With", "value": "starts_with" },
+        { "label": "Ends With", "value": "ends_with" }
+      ],
+      "inputField": {
+        "type": "string",
+        "placeholder": "Enter product name",
+        "validation": {
+          "minLength": 1,
+          "maxLength": 100,
+          "custom": "function(value) { if (value && !/^[a-zA-Z0-9\\s\\-_\\.]+$/.test(value)) return 'Product name can only contain letters, numbers, spaces, hyphens, underscores, and dots'; return ''; }"
+        }
+      }
+    },
+    {
+      "label": "Product Price",
+      "value": "product_price",
+      "comparators": [
+        { "label": "Less Than", "value": "less_than" },
+        { "label": "Greater Than", "value": "greater_than" },
+        { "label": "Equals", "value": "equals" },
+        { "label": "Between", "value": "between" }
+      ],
+      "inputField": {
+        "type": "currency",
+        "placeholder": "Enter price",
+        "currency": "$",
+        "min": 0,
+        "step": 0.01,
+        "validation": {
+          "custom": "function(value) { if (!/^\\d+(\\.\\d{1,2})?$/.test(value)) return 'Price must be a valid number'; const price = parseFloat(value); if (price < 0) return 'Price must be positive'; if (price > 10000) return 'Price seems too high'; return ''; }"
+        }
+      }
+    },
+    {
+      "label": "Product Weight",
+      "value": "product_weight",
+      "comparators": [
+        { "label": "Less Than", "value": "less_than" },
+        { "label": "Greater Than", "value": "greater_than" },
+        { "label": "Equals", "value": "equals" },
+        { "label": "Between", "value": "between" }
+      ],
+      "inputField": {
+        "type": "double",
+        "placeholder": "Enter weight in kg",
+        "min": 0,
+        "step": 0.1,
+        "validation": {
+          "custom": "function(value) { if (!/^\\d+(\\.\\d{1,2})?$/.test(value)) return 'Weight must be a valid number'; const weight = parseFloat(value); if (weight < 0) return 'Weight must be positive'; if (weight > 1000) return 'Weight seems too high'; return ''; }"
+        }
+      }
+    },
+    {
+      "label": "Product Quantity",
+      "value": "product_quantity",
+      "comparators": [
+        { "label": "Less Than", "value": "less_than" },
+        { "label": "Greater Than", "value": "greater_than" },
+        { "label": "Equals", "value": "equals" },
+        { "label": "Between", "value": "between" }
+      ],
+      "inputField": {
+        "type": "number",
+        "placeholder": "Enter quantity",
+        "min": 0,
+        "max": 10000,
+        "step": 1,
+        "validation": {
+          "custom": "function(value) { if (!/^\\d+$/.test(value)) return 'Quantity must be a whole number'; const qty = parseInt(value, 10); if (qty < 0) return 'Quantity must be positive'; if (qty > 10000) return 'Quantity seems too high'; return ''; }"
+        }
+      }
+    },
+    {
+      "label": "Product Launch Date",
+      "value": "product_launch_date",
+      "comparators": [
+        { "label": "Before", "value": "before" },
+        { "label": "After", "value": "after" },
+        { "label": "On", "value": "on" },
+        { "label": "Between", "value": "between" }
+      ],
+      "inputField": {
+        "type": "date",
+        "dateFormat": "YYYY-MM-DD",
+        "validation": {
+          "custom": "function(value) { if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return 'Date must be YYYY-MM-DD'; const d = new Date(value); if (isNaN(d.getTime())) return 'Invalid date'; return ''; }"
+        }
+      }
+    },
+    {
+      "label": "Customer Rating",
+      "value": "customer_rating",
+      "comparators": [
+        { "label": "Less Than", "value": "less_than" },
+        { "label": "Greater Than", "value": "greater_than" },
+        { "label": "Equals", "value": "equals" },
+        { "label": "Between", "value": "between" }
+      ],
+      "inputField": {
+        "type": "double",
+        "placeholder": "Enter rating (1-5)",
+        "min": 1,
+        "max": 5,
+        "step": 0.1,
+        "validation": {
+          "custom": "function(value) { if (!/^\\d+(\\.\\d{1,2})?$/.test(value)) return 'Rating must be a valid number'; const rating = parseFloat(value); if (rating < 1 || rating > 5) return 'Rating must be between 1 and 5'; return ''; }"
+        }
+      }
+    },
+    {
+      "label": "Product Category",
+      "value": "product_category",
+      "comparators": [
+        { "label": "Equals", "value": "equals" },
+        { "label": "Not Equals", "value": "not_equals" },
+        { "label": "In", "value": "in" }
+      ],
+      "inputField": {
+        "type": "string",
+        "placeholder": "Enter category",
+        "validation": {
+          "custom": "function(value) { const validCategories = ['electronics', 'clothing', 'books', 'home', 'sports', 'beauty']; if (value && !validCategories.includes(value.toLowerCase())) return 'Please enter a valid category: ' + validCategories.join(', '); return ''; }"
+        }
+      }
+    }
+  ]
+} 

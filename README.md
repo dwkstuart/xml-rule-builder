@@ -186,6 +186,148 @@ import { resetToDefaultTypes } from 'xml-rule-builder';
 resetToDefaultTypes();
 ```
 
+### Input Field Types
+
+The library supports different input field types for rule values, providing appropriate validation and UI components:
+
+#### Supported Input Field Types
+
+- **`string`**: Text input with optional pattern and length validation
+- **`number`**: Integer input with min/max constraints
+- **`date`**: Date picker with format validation
+- **`currency`**: Numeric input with currency symbol and decimal formatting
+- **`double`**: Decimal number input with precision control
+
+#### Input Field Configuration
+
+Each rule type can specify an `inputField` configuration:
+
+```typescript
+interface InputFieldConfig {
+  type: 'string' | 'number' | 'date' | 'currency' | 'double';
+  placeholder?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+  currency?: string;
+  dateFormat?: string;
+  validation?: {
+    pattern?: string;
+    minLength?: number;
+    maxLength?: number;
+    custom?: (value: string) => string; // Returns error message or empty string
+  };
+}
+```
+
+#### Example: Custom Types with Input Fields
+
+```typescript
+const customTypesWithInputFields: XmlRuleType[] = [
+  {
+    label: 'Product Price',
+    value: 'product_price',
+    comparators: [
+      { label: 'Less Than', value: 'less_than' },
+      { label: 'Greater Than', value: 'greater_than' },
+      { label: 'Equals', value: 'equals' }
+    ],
+    inputField: {
+      type: 'currency',
+      placeholder: 'Enter price',
+      currency: '$',
+      min: 0,
+      step: 0.01,
+      validation: {
+        custom: (value: string) => {
+          if (!/^\d+(\.\d{1,2})?$/.test(value)) return 'Price must be a valid number';
+          const price = parseFloat(value);
+          if (price < 0) return 'Price must be positive';
+          if (price > 10000) return 'Price seems too high';
+          return '';
+        }
+      }
+    }
+  },
+  {
+    label: 'Product Launch Date',
+    value: 'product_launch_date',
+    comparators: [
+      { label: 'Before', value: 'before' },
+      { label: 'After', value: 'after' },
+      { label: 'On', value: 'on' }
+    ],
+    inputField: {
+      type: 'date',
+      dateFormat: 'YYYY-MM-DD',
+      validation: {
+        custom: (value: string) => {
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return 'Date must be YYYY-MM-DD';
+          const d = new Date(value);
+          if (isNaN(d.getTime())) return 'Invalid date';
+          return '';
+        }
+      }
+    }
+  },
+  {
+    label: 'Product Category',
+    value: 'product_category',
+    comparators: [
+      { label: 'Equals', value: 'equals' },
+      { label: 'Not Equals', value: 'not_equals' }
+    ],
+    inputField: {
+      type: 'string',
+      placeholder: 'Enter category',
+      validation: {
+        minLength: 2,
+        maxLength: 50,
+        custom: (value: string) => {
+          const validCategories = ['electronics', 'clothing', 'books', 'home'];
+          if (value && !validCategories.includes(value.toLowerCase())) {
+            return `Please enter a valid category: ${validCategories.join(', ')}`;
+          }
+          return '';
+        }
+      }
+    }
+  }
+];
+```
+
+#### Loading from Configuration File
+
+You can also define input field types in JSON configuration files:
+
+```json
+{
+  "ruleTypes": [
+    {
+      "label": "Product Price",
+      "value": "product_price",
+      "comparators": [
+        { "label": "Less Than", "value": "less_than" },
+        { "label": "Greater Than", "value": "greater_than" },
+        { "label": "Equals", "value": "equals" }
+      ],
+      "inputField": {
+        "type": "currency",
+        "placeholder": "Enter price",
+        "currency": "$",
+        "min": 0,
+        "step": 0.01,
+        "validation": {
+          "custom": "function(value) { if (!/^\\d+(\\.\\d{1,2})?$/.test(value)) return 'Price must be a valid number'; const price = parseFloat(value); if (price < 0) return 'Price must be positive'; return ''; }"
+        }
+      }
+    }
+  ]
+}
+```
+
+See [examples/custom-types-with-input-fields.json](./examples/custom-types-with-input-fields.json) for a complete example configuration file.
+
 ### React Components
 
 ```typescript
@@ -380,10 +522,18 @@ A React component for building XML rules with a visual interface.
 
 The library includes default rule types that can be replaced or extended:
 
-- **Age**: Equals, Less Than, Greater Than, Between
-- **Date of Birth**: Before, After, On, Between
-- **Household Income**: Less Than, Greater Than, Equals, Between
-- **Enrolment Status**: Equals, Not Equals
+- **Age**: Equals, Less Than, Greater Than, Between (number input)
+- **Date of Birth**: Before, After, On, Between (date input)
+- **Email**: Equals, Contains, Ends With, Domain (string input with email validation)
+- **Postcode**: Equals, Starts With, In Area (string input with UK postcode validation)
+- **Zipcode**: Equals, Starts With, In Area (string input with US zipcode validation)
+- **Income**: Less Than, Greater Than, Equals, Between (currency input with £ symbol)
+- **Salary**: Less Than, Greater Than, Equals, Between (currency input with $ symbol)
+- **Price**: Less Than, Greater Than, Equals, Between (double input for decimal numbers)
+- **Gender**: Equals, Not Equals, In (string input with predefined options)
+- **Relationship Status**: Equals, Not Equals, In (string input with predefined options)
+- **Nationality**: Equals, Not Equals, In (string input with letter validation)
+- **Disabilities**: Has, Does Not Have, Count (number input for counting)
 
 ## Example XML Output
 
@@ -394,11 +544,25 @@ The library includes default rule types that can be replaced or extended:
     <income comparator="less_than">50000</income>
     <group logic="OR">
       <dob comparator="after">2000-01-01</dob>
-      <enrolment_status comparator="equals">full_time</enrolment_status>
+      <gender comparator="equals">male</gender>
     </group>
   </group>
 </rules>
 ```
+
+## Examples
+
+### Basic Usage
+See [examples/basic-usage.ts](./examples/basic-usage.ts) for a simple implementation.
+
+### Custom Types
+See [examples/configurable-types-usage.ts](./examples/configurable-types-usage.ts) for custom type configuration.
+
+### Input Field Types
+See [examples/input-field-types-usage.ts](./examples/input-field-types-usage.ts) for examples of different input field types.
+
+### Demo Page
+See [examples/demo-page.html](./examples/demo-page.html) for a complete interactive demo.
 
 ## Troubleshooting
 

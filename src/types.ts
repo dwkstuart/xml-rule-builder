@@ -1,5 +1,25 @@
 import { xmlTypes } from './xmlTypes';
 
+// Input field types
+export type InputFieldType = 'string' | 'number' | 'date' | 'currency' | 'double';
+
+// Input field configuration
+export interface InputFieldConfig {
+  type: InputFieldType;
+  placeholder?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+  currency?: string;
+  dateFormat?: string;
+  validation?: {
+    pattern?: string;
+    minLength?: number;
+    maxLength?: number;
+    custom?: (value: string) => string; // Returns error message or empty string
+  };
+}
+
 export type RuleBlock =
   | {
       type: 'rule';
@@ -33,6 +53,7 @@ export interface XmlRuleType {
   label: string;
   value: string;
   comparators: XmlComparator[];
+  inputField?: InputFieldConfig;
 }
 
 export interface XmlComparator {
